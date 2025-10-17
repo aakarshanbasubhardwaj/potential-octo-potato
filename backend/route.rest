@@ -1,0 +1,5 @@
+###
+GET http://localhost:3333/test
+
+###
+GET http://localhost:3333/movies/popular?page=2
