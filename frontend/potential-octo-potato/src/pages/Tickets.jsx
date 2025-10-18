@@ -4,7 +4,7 @@ import { Typography, Box, Button } from '@mui/material';
 import Ticket from '../components/Ticket.jsx'
 
 
-export default function BookingConfirmation() {
+export default function Tickets() {
   const { confirmationNumber } = useParams();
   const navigate = useNavigate();
   const [ticket, setTicket] = useState(null);

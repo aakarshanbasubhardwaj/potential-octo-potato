@@ -9,3 +9,6 @@ GET http://localhost:3333/movies/getPopularMovieById?id=68f280d6810d65006ccefb73
 
 ###
 GET http://localhost:3333/tickets/getTicket/8E494C66
+
+###
+GET http://localhost:3333/tickets/getAllTickets/

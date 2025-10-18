@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function MovieCard({ movie }) {
   const navigate = useNavigate();
-  const { _id, title, poster_path, genre_ids, vote_average } = movie;
+  const { _id, title, poster_path, genres, vote_average } = movie;
 
   // Use higher quality image
   const imageUrl = poster_path 
@@ -13,7 +13,7 @@ export default function MovieCard({ movie }) {
     : 'https://via.placeholder.com/500x750?text=No+Image';
 
   return (
-    <Card sx={{ width: 160, marginRight: 1, display: 'flex', flexDirection: 'column' }} onClick={() => navigate(`/movie/${_id}`)}>
+    <Card sx={{ width: 160, marginRight: 1, display: 'flex', flexDirection: 'column', height: 380,}} onClick={() => navigate(`/movie/${_id}`)}>
         <CardMedia
             component="img"
             height="250"
@@ -21,15 +21,15 @@ export default function MovieCard({ movie }) {
             alt={title}
             sx={{ objectFit: 'cover' }}
         />
-      <CardContent sx={{ flexGrow: 1 }}>
-        <Typography gutterBottom variant="h6" component="div" noWrap>
+      <CardContent sx={{ flexGrow: 1, overflow: 'hidden' }}>
+        <Typography gutterBottom variant="overline" component="div" noWrap>
           {title}
         </Typography>
-        <Typography variant="caption" color="text.secondary" display="block">
-          Genre: {genre_ids}
+        <Typography variant="caption" color="text.secondary" display="block" sx={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+          {genres.join(' ')}
         </Typography>
         <Typography variant="caption" color="text.secondary" display="block">
-          Rating: {vote_average}
+          {vote_average.toFixed(1)} ⭐
         </Typography>
       </CardContent>
       {/* <CardActions>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-
+import MovieBox from '../components/MovieBox.jsx';
 
 export default function BookingPage() {
   const theme = useTheme();  
@@ -27,10 +27,12 @@ export default function BookingPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            movieId: movie._id,
+            title: movie.original_title,
             date: selectedDate,
             time: selectedTime,
             tickets,
+            poster_path: movie.poster_path,
+            backdrop_path: movie.backdrop_path
         }),
         });
 
@@ -221,43 +223,7 @@ const formatDate = (d) =>
         }}
       />
 
-    
-            
-    <Box
-    sx={{
-        position: 'absolute',
-        top: 20,
-        // left: '50%',
-        // transform: 'translateX(-50%)',
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 2,
-        zIndex: 1,
-        // bgcolor: 'rgba(0,0,0,0.5)',
-        borderRadius: 2,
-        px: 2,
-        py: 1,
-    }}
-    >
-    <Box
-        component="img"
-        src={`https://image.tmdb.org/t/p/w92${movie.poster_path}`}
-        alt={movie.title}
-        sx={{ borderRadius: 1 }}
-    />
-    <Box>
-        <Typography variant="h6" sx={{ color: '#fff', fontWeight: 'bold' }}>
-        {movie.title}
-        </Typography>
-        <Typography variant="body2" sx={{ color: '#ddd' }}>
-        {movie.release_date} • {movie.runtime} min
-        </Typography>
-        <Typography variant="body2" sx={{ color: '#ddd' }}>
-        {movie.vote_average} ⭐ ({movie.vote_count} Votes)
-        </Typography>
-    </Box>
-    </Box>
+      <MovieBox movie={movie}/>
 
       {/* Date & Time pickers */}
       <Box

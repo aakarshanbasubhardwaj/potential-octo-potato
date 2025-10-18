@@ -1,6 +1,7 @@
 import { Router } from "express";
 import popularMovie from '../../../db/models/popularMovieModel.js'
 import dbOperations from "../../../db/methods/dbOperations.js";
+import movieGenres from '../../../db/models/movieGenres.js'
 
 const router = Router();
 
@@ -18,16 +19,28 @@ router.get('/popular', async (req, res) => {
       return res.status(404).json({ error: 'No popular movies found' });
     }
 
+    const genresList = await movieGenres.find({}).lean();
+    const genreMap = {};
+    genresList.forEach(g => {
+      genreMap[g.id] = g.name;
+    });
+
+
     // Get paginated results
     const popularMovies = await popularMovie
       .find({}, null, { skip, limit })
       .lean();
 
+    const moviesWithGenreNames = popularMovies.map(movie => ({
+      ...movie,
+      genres: movie.genre_ids.map(id => genreMap[id] || "Unknown")
+    }));
+
     return res.status(200).json({
       currentPage: page,
       totalPages: Math.ceil(totalCount / limit),
       totalResults: totalCount,
-      results: popularMovies
+      results: moviesWithGenreNames
     });
 
   } catch (err) {
@@ -42,6 +55,14 @@ router.get("/getPopularMovieById", async(req, res) => {
     if(!result){
       return res.status(404).json({ message: "Movie not found" });
     }
+    const genresList = await movieGenres.find({}).lean();
+    const genreMap = {};
+    genresList.forEach(g => {
+      genreMap[g.id] = g.name;
+    });
+    
+    result.genres = result.genre_ids.map(id => genreMap[id] || "Unknown")
+
     return res.status(200).json(result);
   } catch (error) {
     console.error("Error fetching movie by ID:", error);

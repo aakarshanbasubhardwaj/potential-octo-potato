@@ -24,13 +24,13 @@ export default function MovieDetails() {
         alt={movie.title}
         style={{ width: '100%', borderRadius: '10px', marginTop: '1rem' }}
       />
-      <Typography variant="h3">{movie.title}</Typography>
-      <Typography sx={{ mt: 1 }} >{movie.genre_ids}</Typography>
-      <Typography variant="body2" sx={{ mt: 1 }} color="text.secondary">
-        Release: {movie.release_date}
-      </Typography>
+      <Typography variant="h4">{movie.title}</Typography>
+      <Typography sx={{ mt: 1 }} >{movie.genres.join(' ')}</Typography>
       <Typography variant="body2" >
         {movie.vote_average} ⭐ ({movie.vote_count} Votes)
+      </Typography>
+      <Typography variant="body2" sx={{ mt: 1 }} color="text.secondary">
+        {movie.release_date}
       </Typography>
 
       <Typography sx={{ mt: 2, textAlign: 'justify' }}>{movie.overview}</Typography>

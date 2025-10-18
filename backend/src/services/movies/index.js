@@ -2,8 +2,43 @@ import config from '../../config/config.js'
 import axios from 'axios';
 import dbOperations from '../../../db/methods/dbOperations.js';
 import popularMovie from '../../../db/models/popularMovieModel.js';
+import movieGenres from '../../../db/models/movieGenres.js';
 
 const { TMDB_API_KEY, TMDB_BASE_URL, REGION } = config
+
+async function getMovieGenres() {
+  console.log("Fetching Movie Genres from TMDB...")
+  try {
+    let allMovieGenres = [];
+
+
+    const response = await axios.get(`${TMDB_BASE_URL}/genre/movie/list?language=en`, {
+      params: { api_key: TMDB_API_KEY, language: 'en-US', region: REGION },
+    });
+
+    const fetchedMovieGenres = response.data.genres;
+    console.log("Fetched", fetchedMovieGenres.length, "movie genres");
+
+    if (fetchedMovieGenres.length > 0) allMovieGenres.push(...fetchedMovieGenres);
+
+    
+
+    if (allMovieGenres.length > 0) {
+      // Delete existing records
+      await dbOperations.deleteMany(movieGenres);
+      console.log('Existing movie genres deleted.');
+
+      // Insert all new movies
+      await dbOperations.insertMany(movieGenres, allMovieGenres);
+      console.log('New movie genres stored!');
+    } else {
+      console.log('No movie genres fetched, nothing deleted or stored.');
+    }    
+
+  } catch (error) {
+    console.error('Failed to fetch movie genres: ', error);
+  }
+};
 
 async function getPopularMovies() {
   console.log("Fetching Popular Movies from TMDB...")
@@ -47,5 +82,6 @@ async function getPopularMovies() {
 };
 
 export default {
+  getMovieGenres,
   getPopularMovies
 }
