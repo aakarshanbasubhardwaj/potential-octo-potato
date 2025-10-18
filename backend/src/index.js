@@ -3,7 +3,7 @@ import cors from 'cors';
 import conn from '../db/connection/conn.js';
 import movies from './routes/movies/index.js';
 // import tvShows from './routes/tvShows/index.js';
-import fetchMoviesOnServerStart from './services/index.js'
+import checkModelsAndLoadData from './services/index.js'
 
 const app = express();
 app.use(cors())
@@ -22,11 +22,11 @@ await conn.connectToDatabase();
 
 async function loadInitialData(){
   console.log("Loading initial data...");
-  await fetchMoviesOnServerStart();
+  await checkModelsAndLoadData();
 }
 
 app.listen(PORT, () => {
     console.log(`Server Running on http://localhost:${PORT}`);
 });
 
-// loadInitialData()
+loadInitialData()

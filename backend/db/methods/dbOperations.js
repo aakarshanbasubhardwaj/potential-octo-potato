@@ -58,6 +58,16 @@ async function deleteMany(model, filter = {}) {
   return await model.deleteMany(filter);
 }
 
+async function hasData(model) {
+  try {
+    const count = await model.estimatedDocumentCount();
+    return count > 0;
+  } catch (error) {
+    console.error('Error checking data existence:', error);
+    return false;
+  }
+}
+
 
 export default{
     getAll,
@@ -65,5 +75,6 @@ export default{
     insertOne,
     insertMany,
     upsertOne,
-    deleteMany
+    deleteMany,
+    hasData
 }
