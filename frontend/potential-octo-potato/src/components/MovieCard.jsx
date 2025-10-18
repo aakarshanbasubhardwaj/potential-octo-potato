@@ -1,9 +1,11 @@
 // MovieCard.jsx
 import React from 'react';
 import { Card, CardMedia, CardContent, Typography, CardActions, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 export default function MovieCard({ movie }) {
-  const { title, poster_path, release_date, vote_average } = movie;
+  const navigate = useNavigate();
+  const { _id, title, poster_path, genre_ids, vote_average } = movie;
 
   // Use higher quality image
   const imageUrl = poster_path 
@@ -11,7 +13,7 @@ export default function MovieCard({ movie }) {
     : 'https://via.placeholder.com/500x750?text=No+Image';
 
   return (
-    <Card sx={{ width: 160, marginRight: 1, display: 'flex', flexDirection: 'column' }}>
+    <Card sx={{ width: 160, marginRight: 1, display: 'flex', flexDirection: 'column' }} onClick={() => navigate(`/movie/${_id}`)}>
         <CardMedia
             component="img"
             height="250"
@@ -24,7 +26,7 @@ export default function MovieCard({ movie }) {
           {title}
         </Typography>
         <Typography variant="caption" color="text.secondary" display="block">
-          Release: {release_date}
+          Genre: {genre_ids}
         </Typography>
         <Typography variant="caption" color="text.secondary" display="block">
           Rating: {vote_average}

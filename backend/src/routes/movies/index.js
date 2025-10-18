@@ -36,4 +36,17 @@ router.get('/popular', async (req, res) => {
   }
 });
 
+router.get("/getPopularMovieById", async(req, res) => {
+  try {
+    const result = await dbOperations.getOne(popularMovie, {_id : req.query.id});
+    if(!result){
+      return res.status(404).json({ message: "Movie not found" });
+    }
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("Error fetching movie by ID:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+})
+
 export default router;

@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import conn from '../db/connection/conn.js';
 import movies from './routes/movies/index.js';
-// import tvShows from './routes/tvShows/index.js';
+import tickets from './routes/tickets/index.js';
 import checkModelsAndLoadData from './services/index.js'
 
 const app = express();
@@ -16,7 +16,7 @@ app.get("/test", (req, res) => {
 });
 
 app.use("/movies", movies);
-// app.use("/tvShows", tvShows);
+app.use("/tickets", tickets);
 
 await conn.connectToDatabase();
 
