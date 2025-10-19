@@ -1,11 +1,9 @@
 import fetchMovies from './movies/index.js';
 import dbOperations from '../../db/methods/dbOperations.js';
 import popularMovie from '../../db/models/popularMovieModel.js';
+import topRatedMovie from '../../db/models/topRatedMovieModel.js';
+import trendingMovie from '../../db/models/trendingMovieModel.js';
 import movieGenres from '../../db/models/movieGenres.js';
-
-async function fetchMoviesOnServerStart(){
-    await fetchMovies.getPopularMovies()
-}
 
 async function checkModelsAndLoadData() {
     if(! await dbOperations.hasData(movieGenres)){
@@ -16,9 +14,21 @@ async function checkModelsAndLoadData() {
     }
     if(! await dbOperations.hasData(popularMovie)){
         console.log("Popular Movies being loaded");
-        fetchMoviesOnServerStart();
+        await fetchMovies.getPopularMovies();
     } else {
         console.log("Popular Movies exist in DB");
+    }
+    if(! await dbOperations.hasData(topRatedMovie)){
+        console.log("Top Rated Movies being loaded");
+        await fetchMovies.getTopRatedMovies();
+    } else {
+        console.log("Top Rated Movies exist in DB");
+    }
+    if(! await dbOperations.hasData(trendingMovie)){
+        console.log("Trending Movies being loaded");
+        await fetchMovies.getTrendingMovies();
+    } else {
+        console.log("Trending Movies exist in DB");
     }
 }
 

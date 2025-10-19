@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardMedia, CardContent, Typography, CardActions, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-export default function MovieCard({ movie }) {
+export default function MovieCard({ movie, model }) {
   const navigate = useNavigate();
   const { _id, title, poster_path, genres, vote_average } = movie;
 
@@ -13,7 +13,7 @@ export default function MovieCard({ movie }) {
     : 'https://via.placeholder.com/500x750?text=No+Image';
 
   return (
-    <Card sx={{ width: 160, marginRight: 1, display: 'flex', flexDirection: 'column', height: 380,}} onClick={() => navigate(`/movie/${_id}`)}>
+    <Card sx={{ width: 160, marginRight: 1, display: 'flex', flexDirection: 'column', height: 380,}} onClick={() => navigate(`/movie/${_id}/${model}`)}>
         <CardMedia
             component="img"
             height="250"

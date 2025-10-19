@@ -5,11 +5,11 @@ import { useNavigate } from 'react-router-dom';
 
 export default function MovieDetails() {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id, model } = useParams();
   const [movie, setMovie] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:3333/movies/getPopularMovieById?id=${id}`)
+    fetch(`http://localhost:3333/movies/getMovieById?id=${id}&model=${model}`)
       .then(res => res.json())
       .then(data => setMovie(data))
       .catch(console.error);

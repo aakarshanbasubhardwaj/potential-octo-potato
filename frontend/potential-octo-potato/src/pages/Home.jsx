@@ -5,13 +5,16 @@ export default function Home() {
     <div>
       <PaginatedList 
         title="Popular Movies" 
-        apiEndpoint="http://localhost:3333/movies/popular" 
+        model="popularMovie"
       />
-      {/* <PaginatedList 
-        title="Trending TV Shows" 
-        apiEndpoint="http://localhost:3333/tv/trending" 
-        CardComponent={TVShowCard} 
-      /> */}
+      <PaginatedList 
+        title="Top Rated Movies" 
+        model="topRatedMovie"
+      />
+      <PaginatedList 
+        title="Trending This Week" 
+        model="trendingMovie"
+      />
     </div>
   );
 }

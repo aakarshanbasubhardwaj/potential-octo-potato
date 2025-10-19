@@ -7,22 +7,29 @@ export default function BookingHistory() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchTickets = async () => {
-      try {
-        const res = await fetch('http://localhost:3333/tickets/getAllTickets/');
-        if (!res.ok) throw new Error('Failed to fetch tickets');
-        const data = await res.json();
-        setTickets(data);
-      } catch (err) {
-        console.error(err);
-        alert('Failed to load tickets');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTickets();
-  }, []);
+useEffect(() => {
+  const fetchTickets = async () => {
+    try {
+      const res = await fetch('http://localhost:3333/tickets/getAllTickets/');
+      if (!res.ok) throw new Error('Failed to fetch tickets');
+      const data = await res.json();
+
+      // Sort by booking date (descending: newest first)
+      const sortedTickets = data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      setTickets(sortedTickets);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to load tickets');
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchTickets();
+}, []);
+
 
     if (loading)
     return (
@@ -57,9 +64,9 @@ export default function BookingHistory() {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" sx={{ mb: 3, textAlign: 'center' }}>
+      {/* <Typography variant="overline" sx={{ mb: 3, textAlign: 'center' }}>
         Past Tickets
-      </Typography>
+      </Typography> */}
 
       {tickets.map((ticket) => (
         <Card

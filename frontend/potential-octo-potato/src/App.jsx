@@ -31,7 +31,7 @@ export default function App() {
 
         {/* Pages without bottom navigation */}
         <Route path="/" element={<Home />} />
-        <Route path="/movie/:id" element={<MovieDetails />} />
+        <Route path="/movie/:id/:model" element={<MovieDetails />} />
         <Route path="/booking/:id" element={<BookingPage />} />
         <Route path="/confirmation/:confirmationNumber" element={<BookingConfirmation />} />
         <Route path="/bookingHistory" element={<BookingHistory />} />
