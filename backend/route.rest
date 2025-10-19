@@ -12,3 +12,6 @@ GET http://localhost:3333/tickets/getTicket/8E494C66
 
 ###
 GET http://localhost:3333/tickets/getAllTickets/
+
+###
+GET http://localhost:3333/tv/getTv?model=topRatedTv&page=1

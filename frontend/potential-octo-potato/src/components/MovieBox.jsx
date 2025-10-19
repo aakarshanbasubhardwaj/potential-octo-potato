@@ -31,7 +31,7 @@ export default function Ticket({ movie }) {
             {title}
             </Typography>
             <Typography variant="body2" sx={{ color: '#ddd' }}>
-            {release_date} • {runtime} min
+             {release_date}{/* • {runtime} min */}
             </Typography>
             <Typography variant="body2" sx={{ color: '#ddd' }}>
             {vote_average} ⭐ ({vote_count} Votes)

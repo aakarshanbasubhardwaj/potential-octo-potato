@@ -1,25 +1,16 @@
 import React from 'react';
 import { Box, Typography, Divider, Button } from '@mui/material';
 import { QRCodeSVG } from 'qrcode.react';
-import Reply from '@mui/icons-material/Reply';
+import ReplyRoundedIcon from '@mui/icons-material/ReplyRounded';
+import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
 
 export default function Ticket({ ticket }) {
   const { title, date, time, tickets, confirmationNumber, backdrop_path } = ticket;
 
   return (
+    <div id="ticket-content">
     <Box
-    //   sx={{
-    //     // minHeight: '100vh',
-    //     display: 'flex',
-    //     flexDirection: 'column',
-    //     justifyContent: 'flex-start',
-    //     alignItems: 'center',
-    //     top: '50%',
-    //     left: '50%',
-    //     transform: 'translate(-50%,-50%)',
-    //     // bgcolor: '#f4f4f4',
-    //     // p: 0,
-    //   }}
+    id="ticket-content"
     sx={{
         position: 'absolute',
         top: '50%',
@@ -39,13 +30,12 @@ export default function Ticket({ ticket }) {
         <Box
           component="img"
           src={`https://image.tmdb.org/t/p/original${backdrop_path}`}
+          // src={`http://localhost:3333/tickets/tmdb-image?path=${backdrop_path}`}
           alt="Movie Backdrop"
           sx={{
             width: '100%',
             height: { xs: '250px', sm: '320px' },
             objectFit: 'cover',
-            // borderBottomLeftRadius: 12,
-            // borderBottomRightRadius: 12,
             boxShadow: 3,
           }}
         />
@@ -134,10 +124,34 @@ export default function Ticket({ ticket }) {
             Enjoy your show! 🍿🎬
           </Typography>
         </Box>
-        <Button variant="contained" color="primary" startIcon={<Reply />}>
-            Send
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: 2, // space between buttons
+            mt: 2
+          }}
+        >
+        <Button
+          variant="outlined"
+          color="secondary"
+          startIcon={<DownloadRoundedIcon />}
+          onClick={() => {
+            window.open(`http://localhost:3333/tickets/ticket-pdf/${ticket.confirmationNumber}`, '_blank');
+          }}
+        >
+          Download PDF
         </Button>
+
+
+
+
+          <Button variant="contained" color="primary" startIcon={<ReplyRoundedIcon />}>
+            Send
+          </Button>
+        </Box>
       </Box>
     </Box>
+    </div>
   );
 }

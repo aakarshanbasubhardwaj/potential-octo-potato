@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Box, Button } from '@mui/material';
 import Ticket from '../components/Ticket.jsx'
+import { CircularProgress } from '@mui/material';
 
 
 export default function Tickets() {
@@ -44,7 +45,18 @@ export default function Tickets() {
     };
   }, [navigate]);
 
-  if (loading) return <Typography sx={{ p: 2 }}>Loading...</Typography>;
+  if (loading)   return (
+    <Box
+      sx={{
+        height: '100vh',        // full viewport height
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <CircularProgress />
+    </Box>
+  );
   if (!ticket) return <Typography sx={{ p: 2 }}>Ticket not found</Typography>;
 
   return (

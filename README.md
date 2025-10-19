@@ -6,3 +6,8 @@ must have mongo db as docker container
 on server startup it fetches data from tmdb once and stores in mongodb and server everything via server sided pagination from mongodb
 
 frontend react SPA + PWA
+
+send email from send button + when creating ticket
+downdload pdf format button in ticket page
+add search facility
+ticket validator 
