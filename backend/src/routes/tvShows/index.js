@@ -63,6 +63,7 @@ router.get('/getTv', async (req, res) => {
       });
       const TvWithGenreNames = tvShows.map(tv => ({
         ...tv,
+        title: tv.name,
         genres: tv.genre_ids.map(id => genreMap[id] || "Unknown")
       }));
 
@@ -92,7 +93,7 @@ router.get("/getTvById", async(req, res) => {
       if(!result){
         return res.status(404).json({ message: "Tv not found" });
       }
-    } else if (requestedModel === 'trendingTvShow'){
+    } else if (requestedModel === 'trendingTv'){
       result = await dbOperations.getOne(trendingTvShow, {_id : req.query.id});
       if(!result){
         return res.status(404).json({ message: "Tv not found" });
@@ -108,6 +109,7 @@ router.get("/getTvById", async(req, res) => {
     });
     
     result.genres = result.genre_ids.map(id => genreMap[id] || "Unknown")
+    result.title = result.name;
 
     return res.status(200).json(result);
   } catch (error) {

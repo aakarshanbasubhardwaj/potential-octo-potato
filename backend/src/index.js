@@ -4,7 +4,8 @@ import conn from '../db/connection/conn.js';
 import movies from './routes/movies/index.js';
 import tickets from './routes/tickets/index.js';
 import tv from './routes/tvShows/index.js';
-import checkModelsAndLoadData from './services/index.js'
+import search from './routes/search/index.js';
+import checkModelsAndLoadData from './services/index.js';
 
 const app = express();
 app.use(cors())
@@ -19,6 +20,8 @@ app.get("/test", (req, res) => {
 app.use("/movies", movies);
 app.use("/tickets", tickets);
 app.use("/tv", tv);
+app.use("/search", search);
+
 
 await conn.connectToDatabase();
 

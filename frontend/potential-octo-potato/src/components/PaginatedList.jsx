@@ -5,11 +5,12 @@ import { ArrowForwardIos } from '@mui/icons-material';
 
 const movieCache = {};
 
-export default function PaginatedList({ title, model, CardComponent = MovieCard }) {
+export default function PaginatedList({ title, model, itemType, CardComponent = MovieCard }) {
   const [items, setItems] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  const endpoint = (itemType === "movies") ? "getMovie" : "getTv";
 
   const fetchData = async (page = 1) => {
     const cacheKey = `${model}-page-${page}`;
@@ -26,7 +27,7 @@ export default function PaginatedList({ title, model, CardComponent = MovieCard 
     // Otherwise fetch from API
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:3333/movies/getMovie/?page=${page}&model=${model}`);
+      const res = await fetch(`http://localhost:3333/${itemType}/${endpoint}/?page=${page}&model=${model}`);
       const data = await res.json();
 
       // ✅ Save to cache
@@ -68,7 +69,7 @@ export default function PaginatedList({ title, model, CardComponent = MovieCard 
       >
         {items.map(item => (
           <Box key={item._id || item.id} sx={{ flex: '0 0 auto' }}>
-            <CardComponent movie={item} model={model} />
+            <CardComponent movie={item} model={model} itemType={itemType}/>
           </Box>
         ))}
 

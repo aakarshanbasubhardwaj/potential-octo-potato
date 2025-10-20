@@ -27,7 +27,7 @@ export default function BookingPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            title: movie.original_title,
+            title: movie.title,
             date: selectedDate,
             time: selectedTime,
             tickets,

@@ -4,6 +4,7 @@ import topRatedMovie from '../../../db/models/topRatedMovieModel.js';
 import trendingMovie from '../../../db/models/trendingMovieModel.js';
 import dbOperations from "../../../db/methods/dbOperations.js";
 import movieGenres from '../../../db/models/movieGenres.js';
+import searchResultsModel from '../../../db/models/searchResultsModel.js';
 
 const router = Router();
 
@@ -94,6 +95,11 @@ router.get("/getMovieById", async(req, res) => {
       }
     } else if (requestedModel === 'trendingMovie'){
       result = await dbOperations.getOne(trendingMovie, {_id : req.query.id});
+      if(!result){
+        return res.status(404).json({ message: "Movie not found" });
+      }
+    } else if (requestedModel === 'search'){
+      result = await dbOperations.getOne(searchResultsModel, {_id : req.query.id});
       if(!result){
         return res.status(404).json({ message: "Movie not found" });
       }

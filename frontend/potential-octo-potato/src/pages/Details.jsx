@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Typography, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function MovieDetails() {
   const navigate = useNavigate();
   const { id, model } = useParams();
   const [movie, setMovie] = useState(null);
+  const location = useLocation();
+  const { itemType } = location.state;
+  const endpoint = (itemType === "movies") ? "getMovieById" : (itemType === "tv") ? "getTvById" : "getSearchById";
 
   useEffect(() => {
-    fetch(`http://localhost:3333/movies/getMovieById?id=${id}&model=${model}`)
+    fetch(`http://localhost:3333/${itemType}/${endpoint}?id=${id}&model=${model}`)
       .then(res => res.json())
       .then(data => setMovie(data))
       .catch(console.error);
