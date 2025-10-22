@@ -9,4 +9,6 @@ frontend react SPA + PWA
 
 send email from send button + when creating ticket
 
-ticket validator 
+ticket validator - fix validation rules
+
+next show add upcoming and current show logic

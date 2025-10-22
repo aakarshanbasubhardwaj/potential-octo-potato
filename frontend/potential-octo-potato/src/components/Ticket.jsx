@@ -133,8 +133,8 @@ export default function Ticket({ ticket }) {
           }}
         >
         <Button
-          variant="outlined"
-          color="secondary"
+          variant="contained"
+          color="primary"
           startIcon={<DownloadRoundedIcon />}
           onClick={() => {
             window.open(`http://localhost:3333/tickets/ticket-pdf/${ticket.confirmationNumber}`, '_blank');
@@ -145,10 +145,10 @@ export default function Ticket({ ticket }) {
 
 
 
-
-          <Button variant="contained" color="primary" startIcon={<ReplyRoundedIcon />}>
+          {/* TODO - add send email functionality to this button */}
+          {/* <Button variant="contained" color="primary" startIcon={<ReplyRoundedIcon />}>
             Send
-          </Button>
+          </Button> */}
         </Box>
       </Box>
     </Box>

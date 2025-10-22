@@ -6,6 +6,7 @@ import tickets from './routes/tickets/index.js';
 import tv from './routes/tvShows/index.js';
 import search from './routes/search/index.js';
 import checkModelsAndLoadData from './services/index.js';
+import nextShow from './routes/nextShow/index.js';
 
 const app = express();
 app.use(cors())
@@ -21,13 +22,23 @@ app.use("/movies", movies);
 app.use("/tickets", tickets);
 app.use("/tv", tv);
 app.use("/search", search);
-
+app.use("/nextShow", nextShow);
 
 await conn.connectToDatabase();
 
 async function loadInitialData(){
   console.log("Loading initial data...");
   await checkModelsAndLoadData();
+
+  const oneDayMs = 24 * 60 * 60 * 1000;
+  setInterval(async () => {
+    console.log("Daily data refresh triggered...");
+    try {
+      await checkModelsAndLoadData();
+    } catch (err) {
+      console.error("Error during daily refresh:", err);
+    }
+  }, oneDayMs);
 }
 
 app.listen(PORT, () => {

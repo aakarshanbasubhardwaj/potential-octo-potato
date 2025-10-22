@@ -160,4 +160,53 @@ router.get('/ticket-pdf/:confirmationNumber', async (req, res) => {
   doc.end();
 });
 
+router.get("/validate-ticket/:confirmationNumber", async (req, res) => {
+  try {
+    const { confirmationNumber } = req.params;
+
+    // Fetch the ticket
+    const ticket = await db.getOne(Ticket, { confirmationNumber });
+    if (!ticket) {
+      return res.status(404).json({ valid: false, message: "Ticket not found" });
+    }
+    
+    // 2️⃣ Parse ticket date & time in local timezone
+    const [year, month, day] = ticket.date.split("-").map(Number); // YYYY-MM-DD
+    const [hours, minutes] = ticket.time.split(":").map(Number);
+    const ticketDateTime = new Date(year, month - 1, day, hours, minutes, 0);
+    const now = new Date();
+
+
+    // 3️⃣ Expired check
+    if (now > ticketDateTime) {
+      return res.status(200).json({ valid: false, message: "Ticket expired" });
+    }
+
+
+    // 1️⃣ Already used check first
+    if (ticket.validated) {
+      return res.status(200).json({ valid: false, message: "Ticket already used" });
+    }
+
+    // 4️⃣ 30-minute early validation check
+    const earliestValidation = new Date(ticketDateTime.getTime() - 30 * 60 * 1000);
+    if (now < earliestValidation) {
+      return res.status(200).json({
+        valid: false,
+        message: "Ticket can only be validated 30 minutes before showtime"
+      });
+    }
+
+    // 5️⃣ Mark as validated
+    await db.upsertOne(Ticket, { confirmationNumber }, { validated: true });
+
+    return res.status(200).json({ valid: true, message: "Ticket validated successfully" });
+
+  } catch (err) {
+    console.error("Ticket validation error:", err);
+    return res.status(500).json({ valid: false, message: `Internal Server Error: ${err.message}` });
+  }
+});
+
+
 export default router;

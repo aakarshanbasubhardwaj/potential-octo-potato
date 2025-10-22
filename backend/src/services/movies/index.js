@@ -134,7 +134,7 @@ async function getTrendingMovies() {
 
     while (page <= totalPages) {
 
-      const response = await axios.get(`${TMDB_BASE_URL}/trending/movie/week`, {
+      const response = await axios.get(`${TMDB_BASE_URL}/trending/movie/day`, {
         params: { api_key: TMDB_API_KEY, language: 'en-US', page, region: REGION },
       });
 

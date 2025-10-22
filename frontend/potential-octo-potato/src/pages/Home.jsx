@@ -30,7 +30,7 @@ export default function Home() {
             itemType="movies"
           />
           <PaginatedList 
-            title="Trending Movies This Week" 
+            title="Trending Movies" 
             model="trendingMovie"
             itemType="movies"
           />
@@ -45,7 +45,7 @@ export default function Home() {
             itemType="tv"
           />
           <PaginatedList 
-            title="Trending TV Shows This Week" 
+            title="Trending TV Shows" 
             model="trendingTv"
             itemType="tv"
           />
