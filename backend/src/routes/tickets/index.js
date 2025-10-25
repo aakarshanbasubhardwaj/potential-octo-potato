@@ -173,7 +173,7 @@ router.get("/validate-ticket/:confirmationNumber", async (req, res) => {
       console.log(diffMins)
 
       if (diffMins > 30)
-        return res.status(403).json({ valid: false, message: "Validation not allowed yet. Please try again 30 minutes before show time." });
+        return res.status(403).json({ valid: false, message: "Ticket can only be validated 30 minutes before show time." });
 
       await db.upsertOne(Ticket, { confirmationNumber }, { validated: true });
       return res.status(200).json({ valid: true, message: "Ticket validated successfully" });
