@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 
-export default function Ticket({ movie }) {
-  const { title, poster_path, release_date, runtime, vote_average, vote_count } = movie;
+export default function MovieBox({ movie }) {
+  const { title, poster_path, release_date, vote_average, vote_count } = movie;
 
   return (
     
@@ -26,18 +26,20 @@ export default function Ticket({ movie }) {
             alt={title}
             sx={{ borderRadius: 1 }}
         />
-        <Box>
-            <Typography variant="h6" sx={{ color: '#fff', fontWeight: 'bold' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column'}}>
+            <Typography variant="h5" sx={{ color: '#fff',  }}>
             {title}
             </Typography>
-            <Typography variant="body2" sx={{ color: '#ddd' }}>
+            <Typography variant="caption" color="#ddd" sx={{ mt: 1 }}>
+                {movie.genres.join(' ')}
+            </Typography>
+            <Typography variant="caption" sx={{ color: '#ddd' }}>
              {release_date}{/* • {runtime} min */}
             </Typography>
-            <Typography variant="body2" sx={{ color: '#ddd' }}>
-            {vote_average} ⭐ ({vote_count} Votes)
+            <Typography variant="caption" sx={{ color: '#ddd' }}>
+            {vote_average.toFixed(1)} ⭐ ({vote_count} Votes)
             </Typography>
         </Box>
         </Box>
   );
 }
-

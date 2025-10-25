@@ -22,7 +22,7 @@ router.post('/multi', async (req, res) => {
     }
 
     const response = await axios.get(`${TMDB_BASE_URL}/search/multi`, {
-        params: { api_key: TMDB_API_KEY, language: 'en-US', query: searchTerm, page, region: REGION },
+        params: { api_key: TMDB_API_KEY, language: 'en-US', query: searchTerm, page },
     });
     
     // const results = response.data.results;

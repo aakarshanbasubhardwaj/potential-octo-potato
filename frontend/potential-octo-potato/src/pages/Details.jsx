@@ -1,58 +1,122 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Button, Typography, Box } from '@mui/material';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  Divider,
+  Typography,
+  Paper,
+} from '@mui/material';
+import MovieImage from '../components/MovieImage';
 
 export default function MovieDetails() {
-  const navigate = useNavigate();
   const { id, model } = useParams();
-  const [movie, setMovie] = useState(null);
+  const navigate = useNavigate();
   const location = useLocation();
-  const { itemType } = location.state;
-  const endpoint = (itemType === "movies") ? "getMovieById" : (itemType === "tv") ? "getTvById" : "getSearchById";
+  const { itemType } = location.state || {};
+
+  const endpoint =
+    itemType === 'movies'
+      ? 'getMovieById'
+      : itemType === 'tv'
+      ? 'getTvById'
+      : 'getSearchById';
+
+  const [movie, setMovie] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     fetch(`http://localhost:3333/${itemType}/${endpoint}?id=${id}&model=${model}`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch movie details');
+        return res.json();
+      })
       .then(data => setMovie(data))
-      .catch(console.error);
-  }, [id]);
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [id, itemType, endpoint, model]);
 
-  if (!movie) return <Typography>Loading...</Typography>;
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <CircularProgress size={60} thickness={4} />
+      </Box>
+    );
+  }
+
+  if (error || !movie) {
+    return (
+      <Box sx={{ textAlign: 'center', mt: 10 }}>
+        <Typography color="error" variant="h6">
+          {error || 'Movie not found'}
+        </Typography>
+      </Box>
+    );
+  }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <img
-        src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
-        alt={movie.title}
-        style={{ width: '100%', borderRadius: '10px', marginTop: '1rem' }}
-      />
-      <Typography variant="h4">{movie.title}</Typography>
-      <Typography sx={{ mt: 1 }} >{movie.genres.join(' ')}</Typography>
-      <Typography variant="body2" >
-        {movie.vote_average} ⭐ ({movie.vote_count} Votes)
-      </Typography>
-      <Typography variant="body2" sx={{ mt: 1 }} color="text.secondary">
-        {movie.release_date}
-      </Typography>
+    <Box sx={{ pb: 8 }}> {/* space for fixed button */}
+      <Container maxWidth="md" sx={{ p: 2 }}>
+        <MovieImage path={movie.backdrop_path} title={movie.title} />
+        <Box >        
+          <Typography variant="h4" sx={{ mt: 2, fontWeight: 'bold' }}>
+            {movie.title}
+          </Typography>
 
-      <Typography sx={{ mt: 2, textAlign: 'justify' }}>{movie.overview}</Typography>
+          <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>
+            {movie.genres.join(' ')}
+          </Typography>
 
-      <Box
+          <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+            {movie.release_date}
+          </Typography>
+
+          <Typography variant="caption" >
+            {movie.vote_average.toFixed(1)} ⭐ ({movie.vote_count} Votes)
+          </Typography>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Typography sx={{ textAlign: 'justify', lineHeight: 1.6 }}>
+            {movie.overview}
+          </Typography>
+        </Box>
+      </Container>
+
+      {/* Fixed Bottom Bar */}
+      <Paper
         sx={{
           position: 'fixed',
           bottom: 0,
           left: 0,
-          width: '100%',
+          right: 0,
           p: 2,
-          bgcolor: 'background.paper',
-          boxShadow: '0 -2px 8px rgba(0,0,0,0.1)',
+          backgroundColor: 'background.paper',
+          boxShadow: '0 -4px 20px rgba(0,0,0,0.15)',
+          zIndex: 1200,
         }}
+        elevation={3}
       >
-        <Button variant="contained" color="primary" fullWidth onClick={() => navigate(`/booking/${id}`, { state: { movie } })}>
-          Book
-        </Button>
-      </Box>
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{ color: 'white'}}
+            onClick={() => navigate(`/booking/${id}`, { state: { movie } })}
+          >
+            Book
+          </Button>
+      </Paper>
     </Box>
   );
 }

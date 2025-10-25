@@ -133,7 +133,7 @@ export default function Ticket({ ticket }) {
           }}
         >
         <Button
-          variant="contained"
+          variant="outlined"
           color="primary"
           startIcon={<DownloadRoundedIcon />}
           onClick={() => {
@@ -142,13 +142,6 @@ export default function Ticket({ ticket }) {
         >
           Download PDF
         </Button>
-
-
-
-          {/* TODO - add send email functionality to this button */}
-          {/* <Button variant="contained" color="primary" startIcon={<ReplyRoundedIcon />}>
-            Send
-          </Button> */}
         </Box>
       </Box>
     </Box>

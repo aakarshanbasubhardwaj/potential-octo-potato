@@ -29,12 +29,9 @@ export default function SearchResults({ searchTerm, model, initialResults = [] }
 
   return (
     <Box sx={{ mt: 2 }}>
-      {/* <Typography variant="overline" sx={{ mb: 1, ml: 1 }}>
-        Search Results
-      </Typography> */}
-      <Grid container  justifyContent="space-evenly">
+      <Grid container spacing={2} justifyContent="space-evenly">
         {results.map(movie => (
-          <Grid item xs={6} key={movie.id}> {/* 2 columns: xs=6 */}
+          <Grid item xs={6} key={movie._id} >
             <MovieCard movie={movie} model={model} itemType={"search"}/>
           </Grid>
         ))}
@@ -43,13 +40,13 @@ export default function SearchResults({ searchTerm, model, initialResults = [] }
       {results.length > 0 && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
           <Button
-                variant="text"
-                onClick={loadNextPage}
-                disabled={loading}
-                color="secondary"
-                >
-                {loading ? 'Loading...' : 'More'}
-            </Button>
+            variant="text"
+            onClick={loadNextPage}
+            disabled={loading}
+            color="secondary"
+            >
+            {loading ? 'Loading...' : 'More'}
+          </Button>
 
         </Box>
       )}

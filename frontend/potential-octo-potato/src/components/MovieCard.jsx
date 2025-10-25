@@ -7,7 +7,10 @@ export default function MovieCard({ movie, model, itemType }) {
   const navigate = useNavigate();
   const { _id, title, poster_path, genres, vote_average } = movie;
 
-  // Use higher quality image
+  // if (!title || !poster_path || vote_average == null || !genres?.length) {
+  //   return null;
+  // }
+
   const imageUrl = poster_path 
     ? `https://image.tmdb.org/t/p/w780${poster_path}` 
     : 'https://via.placeholder.com/500x750?text=No+Image';
@@ -32,10 +35,6 @@ export default function MovieCard({ movie, model, itemType }) {
           {vote_average.toFixed(1)} ⭐
         </Typography>
       </CardContent>
-      {/* <CardActions>
-        <Button size="small">Details</Button>
-        <Button size="small">Book</Button>
-      </CardActions> */}
     </Card>
   );
 }

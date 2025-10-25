@@ -61,7 +61,7 @@ async function getPopularTv() {
 
       if (tv.length > 0) allTv.push(...tv);
 
-      if (page === 1) totalPages = Math.min(response.data.total_pages, 1);
+      if (page === 1) totalPages = Math.min(response.data.total_pages, 5);
 
       page++;
     }
@@ -102,7 +102,7 @@ async function getTopRatedTv() {
 
       if (tv.length > 0) allTv.push(...tv);
 
-      if (page === 1) totalPages = Math.min(response.data.total_pages, 1);
+      if (page === 1) totalPages = Math.min(response.data.total_pages, 5);
 
       page++;
     }
@@ -143,7 +143,7 @@ async function getTrendingTv() {
 
       if (tv.length > 0) allTv.push(...tv);
 
-      if (page === 1) totalPages = Math.min(response.data.total_pages, 1);
+      if (page === 1) totalPages = Math.min(response.data.total_pages, 2);
 
       page++;
     }

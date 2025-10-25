@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Typography, CircularProgress  } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import MovieBox from '../components/MovieBox.jsx';
 
@@ -19,6 +19,7 @@ export default function BookingPage() {
   const dateItemRefs = useRef([]);
 
   const [loading, setLoading] = useState(false);
+  const [bgLoaded, setBgLoaded] = useState(false); 
 
   const handleConfirmBooking = async () => {
     setLoading(true);
@@ -191,60 +192,79 @@ const formatDate = (d) =>
     </Box>
     );
 
+  useEffect(() => {
+    const img = new Image();
+    img.src = `https://image.tmdb.org/t/p/original${movie.poster_path}`;
+    img.onload = () => setBgLoaded(true);
+  }, [movie.poster_path]);
 
+  if (!bgLoaded) {
+    return (
+      <Box
+        sx={{
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <CircularProgress size={60} color="primary" />
+      </Box>
+    );
+  }
 
   return (
     <Box
+    sx={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
+      margin: 0,
+      padding: 0,
+      overflow: 'hidden',
+      backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.poster_path})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      color: '#fff',
+    }}
+  >
+    {/* Dark overlay */}
+    <Box
       sx={{
-        height: '100vh',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        bgcolor: 'rgba(0,0,0,0.6)',
+        backdropFilter: 'blur(20px)',
+      }}
+    />
+
+    <MovieBox movie={movie} />
+
+    {/* Date + Time pickers */}
+    <Box
+      sx={{
+        position: 'absolute',
+        top: '25%',
+        left: '50%',
+        transform: 'translateX(-50%)',
         display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        // width: '100%',
-        position: 'relative',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
-        backgroundImage: `url(https://image.tmdb.org/t/p/original${movie.poster_path})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        color: '#fff',
+        gap: 2,
+        zIndex: 2,
+        minWidth: 300,
       }}
     >
-      {/* Overlay */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          height: '100%',
-          width: '100%',
-          bgcolor: 'rgba(0,0,0,0.6)',
-          backdropFilter: 'blur(20px)',
-        }}
-      />
+      {renderVerticalPicker(dates, selectedDate, setSelectedDate, dateRef, formatDate, dateItemRefs)}
+      {renderVerticalPicker(times, selectedTime, setSelectedTime, timeRef)}
+    </Box>
 
-      <MovieBox movie={movie}/>
-
-      {/* Date & Time pickers */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '25%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          gap: 2,
-          zIndex: 1,
-          minWidth: 300,
-        }}
-      >
-        {renderVerticalPicker(dates, selectedDate, setSelectedDate, dateRef, formatDate, dateItemRefs)}
-        {renderVerticalPicker(times, selectedTime, setSelectedTime, timeRef)}
-      </Box>
-
-      {/* Ticket picker */}
+    {/* Ticket picker */}
     <Box
-    sx={{
+      sx={{
         position: 'absolute',
         top: '55%',
         left: '50%',
@@ -257,63 +277,83 @@ const formatDate = (d) =>
         py: 1,
         width: 180,
         justifyContent: 'space-between',
-        zIndex: 1,
+        zIndex: 2,
         boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-    }}
+      }}
     >
-    <Button
+      <Button
         onClick={decrementTickets}
         sx={{
-        color: '#fff',
-        minWidth: 40,
-        fontWeight: 'bold',
-        bgcolor: theme.palette.primary.main,
-        borderRadius: '50%',
-        '&:hover': { bgcolor: theme.palette.primary.dark },
+          color: '#fff',
+          minWidth: 40,
+          fontWeight: 'bold',
+          bgcolor: theme.palette.primary.main,
+          borderRadius: '50%',
+          '&:hover': { bgcolor: theme.palette.primary.dark },
         }}
-    >
+      >
         -
-    </Button>
+      </Button>
 
-    <Typography
+      <Typography
         sx={{
-        color: '#fff',
-        fontSize: '1.4rem',
-        fontWeight: 'bold',
-        width: 40,
-        textAlign: 'center',
+          color: '#fff',
+          fontSize: '1.4rem',
+          fontWeight: 'bold',
+          width: 40,
+          textAlign: 'center',
         }}
-    >
+      >
         {tickets}
-    </Typography>
+      </Typography>
 
-    <Button
+      <Button
         onClick={incrementTickets}
         sx={{
-        color: '#fff',
-        minWidth: 40,
-        fontWeight: 'bold',
-        bgcolor: theme.palette.primary.main,
-        borderRadius: '50%',
-        '&:hover': { bgcolor: theme.palette.primary.dark },
+          color: '#fff',
+          minWidth: 40,
+          fontWeight: 'bold',
+          bgcolor: theme.palette.primary.main,
+          borderRadius: '50%',
+          '&:hover': { bgcolor: theme.palette.primary.dark },
         }}
-    >
+      >
         +
-    </Button>
+      </Button>
     </Box>
 
-
-      {/* Confirm Button */}
+    {/* Bottom button */}
+    <Box
+      sx={{
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0, 
+        p: 2,
+        // backgroundColor: "white",
+        boxShadow: "0 -2px 10px rgba(0,0,0,0.1)",
+        zIndex: 1000,
+      }}
+    >
       <Button
         variant="contained"
         color="primary"
         fullWidth
-        sx={{ position: 'absolute', bottom: 0, left: 0, borderRadius: 0, zIndex: 1 }}
+        sx={{ color: 'white'}}
         onClick={handleConfirmBooking}
         disabled={loading}
-        >
-        {loading ? 'Booking...' : 'Confirm Booking'}
-        </Button>
+      >
+        {loading ? (
+          <CircularProgress
+            size={24}
+            sx={{ color: 'white' }}
+          />
+        ) : (
+          'Confirm Booking'
+        )}
+      </Button>
     </Box>
+  </Box>
+
   );
 }

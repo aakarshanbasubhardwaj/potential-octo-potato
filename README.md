@@ -7,12 +7,5 @@ on server startup it fetches data from tmdb once and stores in mongodb and serve
 
 frontend react SPA + PWA
 
-send email from send button + when creating ticket
-
-ticket validator 
-
-expired ticket logic in frontned
-conf# position in frontend
-
 sudo timedatectl set-timezone Europe/Berlin
 logos inindex.html

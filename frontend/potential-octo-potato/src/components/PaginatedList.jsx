@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, CircularProgress } from '@mui/material';
+import { Box, Typography, Button, CircularProgress, Skeleton } from '@mui/material';
 import MovieCard from './MovieCard';
 import { ArrowForwardIos } from '@mui/icons-material';
 
@@ -15,7 +15,6 @@ export default function PaginatedList({ title, model, itemType, CardComponent = 
   const fetchData = async (page = 1) => {
     const cacheKey = `${model}-page-${page}`;
 
-    // ✅ Check cache first
     if (movieCache[cacheKey]) {
       const cached = movieCache[cacheKey];
       setItems(prev => page === 1 ? cached.results : [...prev, ...cached.results]);
@@ -24,13 +23,10 @@ export default function PaginatedList({ title, model, itemType, CardComponent = 
       return;
     }
 
-    // Otherwise fetch from API
     try {
       setLoading(true);
       const res = await fetch(`http://localhost:3333/${itemType}/${endpoint}/?page=${page}&model=${model}`);
       const data = await res.json();
-
-      // ✅ Save to cache
       movieCache[cacheKey] = data;
 
       setItems(prev => page === 1 ? data.results : [...prev, ...data.results]);
@@ -51,6 +47,8 @@ export default function PaginatedList({ title, model, itemType, CardComponent = 
     if (currentPage < totalPages) fetchData(currentPage + 1);
   };
 
+  const skeletonCount = 6;
+
   return (
     <Box sx={{ mb: 3, position: 'relative' }}>
       <Typography variant="overline" sx={{ mb: 1, ml: 1 }}>
@@ -67,11 +65,19 @@ export default function PaginatedList({ title, model, itemType, CardComponent = 
           opacity: loading ? 0.5 : 1,
         }}
       >
-        {items.map(item => (
-          <Box key={item._id || item.id} sx={{ flex: '0 0 auto' }}>
-            <CardComponent movie={item} model={model} itemType={itemType}/>
-          </Box>
-        ))}
+        {loading && items.length === 0
+          ? Array.from({ length: skeletonCount }).map((_, index) => (
+              <Box key={index} sx={{ flex: '0 0 auto', width: 150 }}>
+                <Skeleton variant="rectangular" height={225} sx={{ borderRadius: 1 }} />
+                <Skeleton variant="text" sx={{ mt: 1 }} />
+                <Skeleton variant="text" width="60%" />
+              </Box>
+            ))
+          : items.map(item => (
+              <Box key={item._id || item.id} sx={{ flex: '0 0 auto' }}>
+                <CardComponent movie={item} model={model} itemType={itemType}/>
+              </Box>
+            ))}
 
         {!loading && currentPage < totalPages && (
           <Box sx={{ display: 'flex', alignItems: 'center', px: 2 }}>
@@ -80,25 +86,11 @@ export default function PaginatedList({ title, model, itemType, CardComponent = 
               onClick={handleNextPage}
               sx={{ minWidth: 'auto', padding: 1 }}
             >
-              <ArrowForwardIos />
+              <ArrowForwardIos sx={{ color: 'white' }} />
             </Button>
           </Box>
         )}
       </Box>
-
-      {loading && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 2,
-          }}
-        >
-          <CircularProgress size={40} />
-        </Box>
-      )}
     </Box>
   );
 }
