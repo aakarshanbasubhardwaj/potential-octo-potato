@@ -17,13 +17,10 @@ GET http://localhost:3333/tickets/getAllTickets/
 GET http://localhost:3333/tv/getTv?model=topRatedTv&page=1
 
 ###
-GET http://localhost:3333/tickets/validate-ticket/4E863C2F
+GET http://localhost:3333/tickets/validate-ticket/F70BFBF8
 
 ###
-GET http://localhost:3333/tickets/validate-ticket/B873209F
+GET http://localhost:3333/tickets/validate-ticket/FBE08827
 
 ###
-GET http://localhost:3333/tickets/validate-ticket/624D4DC0
-
-###
-GET http://localhost:3333/nextShow/next-upcoming-show
+GET http://localhost:3333/nextShow/showSchedule

@@ -25,7 +25,7 @@ router.post('/createTicket', async (req, res) => {
       tickets,
       confirmationNumber,
       poster_path,
-      backdrop_path
+      backdrop_path,
     };
 
     await db.insertOne(Ticket, ticketData);
@@ -57,7 +57,7 @@ router.get('/getAllTickets', async (req, res) => {
 
     const ticket = await db.getAll(Ticket);
 
-    if (!ticket) return res.status(404).json({ error: 'No tickets not found' });
+    if (!ticket || ticket.length === 0 ) return res.status(404).json({ error: 'No tickets not found' });
 
     return res.json(ticket);
   } catch (error) {
@@ -66,147 +66,124 @@ router.get('/getAllTickets', async (req, res) => {
   }
 });
 
-router.get('/tmdb-image', async (req, res) => {
-  const { path } = req.query;
-  const response = await fetch(`https://image.tmdb.org/t/p/original${path}`);
-  const buffer = await response.arrayBuffer();
-  res.set('Content-Type', 'image/jpeg');
-  res.set('Access-Control-Allow-Origin', '*');
-  res.send(Buffer.from(buffer));
-});
+// router.get('/tmdb-image', async (req, res) => {
+//   const { path } = req.query;
+//   const response = await fetch(`https://image.tmdb.org/t/p/original${path}`);
+//   const buffer = await response.arrayBuffer();
+//   res.set('Content-Type', 'image/jpeg');
+//   res.set('Access-Control-Allow-Origin', '*');
+//   res.send(Buffer.from(buffer));
+// });
 
 
 router.get('/ticket-pdf/:confirmationNumber', async (req, res) => {
-  const ticketId = req.params.confirmationNumber;
+  try {
+    const ticketId = req.params.confirmationNumber;
 
-  // Fetch ticket details from DB
-  const ticket = await db.getOne(Ticket, { confirmationNumber: ticketId });
-  if (!ticket) return res.status(404).send('Ticket not found');
+    // Fetch ticket details from DB
+    const ticket = await db.getOne(Ticket, { confirmationNumber: ticketId });
+    if (!ticket) return res.status(404).send('Ticket not found');
 
-  const { title, date, time, tickets, confirmationNumber, backdrop_path } = ticket;
+    const { title, date, time, tickets, confirmationNumber, backdrop_path } = ticket;
 
-  // Set response headers
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `attachment; filename=${title}-ticket.pdf`);
+    // Set response headers
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=${title}-ticket.pdf`);
 
-  const doc = new PDFDocument({
-    size: [350, 555],
-    margin: 20
-  });
+    const doc = new PDFDocument({
+      size: [350, 555],
+      margin: 20
+    });
 
-  // Pipe PDF directly to response
-  doc.pipe(res);
+    // Pipe PDF directly to response
+    doc.pipe(res);
 
-  let currentY = 0;
-  const leftX = 20;
-  const rightX = 200;
+    let currentY = 0;
+    const leftX = 20;
+    const rightX = 200;
 
-  // Draw backdrop if available
-  if (backdrop_path) {
-    const imageRes = await fetch(`https://image.tmdb.org/t/p/original${backdrop_path}`);
-    const imgBuffer = Buffer.from(await imageRes.arrayBuffer());
-    doc.image(imgBuffer, 0, currentY, { width: 360, height: 180, align: 'center' });
-    currentY += 180 + 30;
+    // Draw backdrop if available
+    if (backdrop_path) {
+      const imageRes = await fetch(`https://image.tmdb.org/t/p/original${backdrop_path}`);
+      const imgBuffer = Buffer.from(await imageRes.arrayBuffer());
+      doc.image(imgBuffer, 0, currentY, { width: 360, height: 180, align: 'center' });
+      currentY += 180 + 30;
+    }
+
+    // Draw title
+    doc.fontSize(14).text(title, 0, currentY, { align: 'center', width: 360 });
+    currentY += 15;
+
+    // Draw QR code bigger
+    const qrDataURL = await QRCode.toDataURL(confirmationNumber, { width: 250 });
+    doc.image(qrDataURL, 50, currentY, { width: 250, height: 250 });
+    currentY += 250;
+    doc.save(); 
+    doc.moveTo(0, currentY)              
+      .lineTo(360, currentY)             
+      .dash(5, { space: 2 })             
+      .strokeColor('rgba(0,0,0,0.5)')            
+      .stroke();                         
+    doc.undash(); 
+    doc.restore(); 
+
+    currentY += 20;
+
+    // Date and Time
+    doc.font('Helvetica-Bold').text('Date:', leftX, currentY);
+    doc.font('Helvetica').text(date, leftX + 40, currentY); 
+
+    doc.font('Helvetica-Bold').text('Time:', rightX, currentY);
+    doc.font('Helvetica').text(time, rightX + 40, currentY);
+
+    currentY += 20;
+
+    // Tickets and Conf #
+    doc.font('Helvetica-Bold').text('Tickets:', leftX, currentY);
+    doc.font('Helvetica').text(tickets, leftX + 55, currentY);
+
+    doc.font('Helvetica-Bold').text('Conf #:', rightX, currentY);
+    doc.font('Helvetica').text(confirmationNumber, rightX + 50, currentY);
+
+    doc.end();
+
+  } catch (err) {
+    console.error("PDF generation error:", err);
+    res.status(500).json({ error: "Failed to generate ticket PDF" });
   }
-
-  // Draw title
-  doc.fontSize(14).text(title, 0, currentY, { align: 'center', width: 360 });
-  currentY += 15;
-
-  // Draw QR code bigger
-  const qrDataURL = await QRCode.toDataURL(confirmationNumber, { width: 250 });
-  doc.image(qrDataURL, 50, currentY, { width: 250, height: 250 }); // centered
-  currentY += 250;
-
-  // Draw details side by side
-  // doc.fontSize(12);
-  // doc.text(`Date: ${date}`, 20, currentY);
-  // doc.text(`Time: ${time}`, 200, currentY);
-  // currentY += 20;
-
-  // doc.text(`Tickets: ${tickets}`, 20, currentY);
-  // doc.text(`Conf #: ${confirmationNumber}`, 200, currentY);
-  // currentY += 30;
-
-  doc.save(); // save current state
-  doc.moveTo(0, currentY)               // start point (left margin, currentY)
-    .lineTo(360, currentY)              // end point (right margin, currentY)
-    .dash(5, { space: 2 })              // 5px dash, 5px space
-    .strokeColor('rgba(0,0,0,0.5)')             // line color
-    .stroke();                          // draw the line
-  doc.undash(); // remove dash effect for future lines
-  doc.restore(); // restore previous state
-
-  currentY += 20;
-
-  // Date and Time
-  doc.font('Helvetica-Bold').text('Date:', leftX, currentY);
-  doc.font('Helvetica').text(date, leftX + 40, currentY); // value
-
-  doc.font('Helvetica-Bold').text('Time:', rightX, currentY);
-  doc.font('Helvetica').text(time, rightX + 40, currentY);
-
-  currentY += 20;
-
-  // Tickets and Conf #
-  doc.font('Helvetica-Bold').text('Tickets:', leftX, currentY);
-  doc.font('Helvetica').text(tickets, leftX + 55, currentY);
-
-  doc.font('Helvetica-Bold').text('Conf #:', rightX, currentY);
-  doc.font('Helvetica').text(confirmationNumber, rightX + 50, currentY);
-
-  // currentY += 10;
-
-  doc.end();
 });
 
 router.get("/validate-ticket/:confirmationNumber", async (req, res) => {
   try {
     const { confirmationNumber } = req.params;
 
-    // Fetch the ticket
     const ticket = await db.getOne(Ticket, { confirmationNumber });
-    if (!ticket) {
+    if (!ticket || ticket.length === 0) {
       return res.status(404).json({ valid: false, message: "Ticket not found" });
     }
-    
-    // 2️⃣ Parse ticket date & time in local timezone
-    const [year, month, day] = ticket.date.split("-").map(Number); // YYYY-MM-DD
-    const [hours, minutes] = ticket.time.split(":").map(Number);
-    const ticketDateTime = new Date(year, month - 1, day, hours, minutes, 0);
-    const now = new Date();
 
-
-    // 3️⃣ Expired check
-    if (now > ticketDateTime) {
-      return res.status(200).json({ valid: false, message: "Ticket expired" });
-    }
-
-
-    // 1️⃣ Already used check first
     if (ticket.validated) {
-      return res.status(200).json({ valid: false, message: "Ticket already used" });
+      return res.status(409).json({ valid: false, message: "Ticket already used" });
+    } else {
+      const showDateTime = new Date(`${ticket.date} ${ticket.time}`);
+      const now = new Date();
+      const diffMs = showDateTime - now;
+      const diffMins = diffMs / (1000 * 60);
+
+      console.log(diffMins)
+
+      if (diffMins > 30)
+        return res.status(403).json({ valid: false, message: "Validation not allowed yet. Please try again 30 minutes before show time." });
+
+      await db.upsertOne(Ticket, { confirmationNumber }, { validated: true });
+      return res.status(200).json({ valid: true, message: "Ticket validated successfully" });
     }
-
-    // 4️⃣ 30-minute early validation check
-    const earliestValidation = new Date(ticketDateTime.getTime() - 30 * 60 * 1000);
-    if (now < earliestValidation) {
-      return res.status(200).json({
-        valid: false,
-        message: "Ticket can only be validated 30 minutes before showtime"
-      });
-    }
-
-    // 5️⃣ Mark as validated
-    await db.upsertOne(Ticket, { confirmationNumber }, { validated: true });
-
-    return res.status(200).json({ valid: true, message: "Ticket validated successfully" });
-
   } catch (err) {
     console.error("Ticket validation error:", err);
     return res.status(500).json({ valid: false, message: `Internal Server Error: ${err.message}` });
   }
 });
+
 
 
 export default router;

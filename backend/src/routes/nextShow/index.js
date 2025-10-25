@@ -1,11 +1,11 @@
 import express from "express";
-import { getNextUpcomingShow } from "../../services/nextShow/index.js";
+import { getNextShow } from "../../services/nextShow/index.js";
 
 const router = express.Router();
 
-router.get("/next-upcoming-show", async (req, res) => {
+router.get("/showSchedule", async (req, res) => {
   try {
-    const nextShow = await getNextUpcomingShow();
+    const nextShow = await getNextShow();
 
     if (!nextShow) {
       return res.status(200).json({ message: "No upcoming shows" });
