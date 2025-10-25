@@ -11,9 +11,8 @@ send email from send button + when creating ticket
 
 ticket validator 
 
-next show add upcoming and current show logic
-
 expired ticket logic in frontned
 conf# position in frontend
 
 sudo timedatectl set-timezone Europe/Berlin
+logos inindex.html
