@@ -30,7 +30,6 @@ export default function Ticket({ ticket }) {
         <Box
           component="img"
           src={`https://image.tmdb.org/t/p/original${backdrop_path}`}
-          // src={`http://localhost:3333/tickets/tmdb-image?path=${backdrop_path}`}
           alt="Movie Backdrop"
           sx={{
             width: '100%',

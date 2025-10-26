@@ -8,4 +8,7 @@ on server startup it fetches data from tmdb once and stores in mongodb and serve
 frontend react SPA + PWA
 
 sudo timedatectl set-timezone Europe/Berlin
+
+
 logos inindex.html
+cors

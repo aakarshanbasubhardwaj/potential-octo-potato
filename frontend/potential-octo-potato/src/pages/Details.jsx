@@ -57,7 +57,13 @@ export default function MovieDetails() {
 
   if (error || !movie) {
     return (
-      <Box sx={{ textAlign: 'center', mt: 10 }}>
+      <Box 
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',   
+        height: '100vh',         
+      }}>
         <Typography color="error" variant="h6">
           {error || 'Movie not found'}
         </Typography>
@@ -74,13 +80,17 @@ export default function MovieDetails() {
             {movie.title}
           </Typography>
 
-          <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 1 }}>
-            {movie.genres.join(' ')}
+          <Typography variant="subtitle2" sx={{ mt: 1 }}>
+            {movie.genres.join(' | ')}
           </Typography>
 
-          <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+          <Typography variant="caption"  sx={{ mb: 1 }}>
             {movie.release_date}
           </Typography>
+
+          {movie.runtime ? <Typography variant="subtitle2" sx={{ mt: 1 }}>
+            {movie.runtime} mins
+          </Typography>: null}
 
           <Typography variant="caption" >
             {movie.vote_average.toFixed(1)} ⭐ ({movie.vote_count} Votes)
@@ -112,7 +122,7 @@ export default function MovieDetails() {
             variant="contained"
             fullWidth
             sx={{ color: 'white'}}
-            onClick={() => navigate(`/booking/${id}`, { state: { movie } })}
+            onClick={() => navigate(`/booking/${id}`, { state: { movie, model } })}
           >
             Book
           </Button>

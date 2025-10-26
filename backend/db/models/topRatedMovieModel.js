@@ -20,4 +20,3 @@ const topRatedMovieModel = new mongoose.Schema({
 const topRatedMovie = mongoose.model('topRatedMovie', topRatedMovieModel);
 
 export default topRatedMovie;
-

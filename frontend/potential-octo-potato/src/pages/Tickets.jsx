@@ -1,15 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Typography, Box, Button } from '@mui/material';
-import Ticket from '../components/Ticket.jsx'
-import { CircularProgress } from '@mui/material';
-
+import {
+  Typography,
+  Box,
+  CircularProgress,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Button,
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import Ticket from '../components/Ticket.jsx';
 
 export default function Tickets() {
   const { confirmationNumber } = useParams();
   const navigate = useNavigate();
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Fetch ticket details
   useEffect(() => {
@@ -21,45 +31,80 @@ export default function Tickets() {
         setTicket(data);
       } catch (err) {
         console.error(err);
-        alert('Failed to load ticket');
-        navigate('/', { replace: true });
+        setErrorMessage('Failed to load ticket: ' + (err.message || 'Unknown Error'));
+        setErrorDialogOpen(true);
       } finally {
         setLoading(false);
       }
     };
     fetchTicket();
-  }, [confirmationNumber, navigate]);
+  }, [confirmationNumber]);
 
-  // Prevent going back to previous pages
+  // Prevent going back
   useEffect(() => {
-    // push current page into history
     window.history.pushState(null, '', window.location.href);
-
-    const onPopState = () => {
-      navigate('/', { replace: true });
-    };
-
+    const onPopState = () => navigate('/', { replace: true });
     window.addEventListener('popstate', onPopState);
-    return () => {
-      window.removeEventListener('popstate', onPopState);
-    };
+    return () => window.removeEventListener('popstate', onPopState);
   }, [navigate]);
 
-  if (loading)   return (
-    <Box
-      sx={{
-        height: '100vh',        // full viewport height
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <CircularProgress />
-    </Box>
-  );
-  if (!ticket) return <Typography sx={{ p: 2 }}>Ticket not found</Typography>;
+  if (loading)
+    return (
+      <Box
+        sx={{
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
 
   return (
-    <Ticket ticket={ticket} />    
+    <>
+      {errorDialogOpen && (
+        <Dialog
+          open={errorDialogOpen}
+          onClose={() => {}}  
+          disableEscapeKeyDown
+          maxWidth="xs"
+          fullWidth
+        >
+          <DialogTitle
+            sx={{
+              bgcolor: 'error.main',
+              color: '#fff',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              pr: 1,
+            }}
+          >
+            <Typography variant="h6">Error</Typography>
+          </DialogTitle>
+          <DialogContent dividers sx={{ bgcolor: 'background.paper' }}>
+            <Typography variant="body1" color="textPrimary">
+              {errorMessage}
+            </Typography>
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => {
+                  setErrorDialogOpen(false);
+                  navigate('/', { replace: true });
+                }}
+              >
+                Go Home
+              </Button>
+            </Box>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {ticket && <Ticket ticket={ticket} />}
+    </>
   );
 }

@@ -1,15 +1,17 @@
 import express from 'express';
 import Ticket from '../../../db/models/ticketModel.js';
+import Booking from '../../../db/models/bookingModel.js';
 import crypto from 'crypto';
 import db from '../../../db/methods/dbOperations.js';
 import PDFDocument from 'pdfkit';
 import QRCode from 'qrcode';
+import validator from '../../services/bookingValidator/index.js';
 
 const router = express.Router();
 
-router.post('/createTicket', async (req, res) => {
+router.post('/createTicket', validator.validateBookingSlot, async (req, res) => {
   try {
-    const { title, date, time, tickets, poster_path, backdrop_path } = req.body;
+    const { title, date, time, tickets, poster_path, backdrop_path, runtime, id, type } = req.body;
 
     if (!title || !date || !time || !tickets) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -26,9 +28,23 @@ router.post('/createTicket', async (req, res) => {
       confirmationNumber,
       poster_path,
       backdrop_path,
+      runtime,
     };
-
     await db.insertOne(Ticket, ticketData);
+
+    const bookingData = {
+      id,
+      type,
+      title,
+      date,
+      time,
+      runtime,
+      tickets,
+      poster_path,
+      backdrop_path
+    };
+    await db.insertOne(Booking, bookingData);
+
 
     return res.status(201).json({ confirmationNumber });
   } catch (error) {
@@ -41,7 +57,7 @@ router.get('/getTicket/:confirmationNumber', async (req, res) => {
   try {
     const { confirmationNumber } = req.params;
 
-    const ticket = await db.getOne(Ticket, { confirmationNumber });
+    const ticket = await db.getOne(Ticket, { confirmationNumber: confirmationNumber });
 
     if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
 
@@ -65,16 +81,6 @@ router.get('/getAllTickets', async (req, res) => {
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-// router.get('/tmdb-image', async (req, res) => {
-//   const { path } = req.query;
-//   const response = await fetch(`https://image.tmdb.org/t/p/original${path}`);
-//   const buffer = await response.arrayBuffer();
-//   res.set('Content-Type', 'image/jpeg');
-//   res.set('Access-Control-Allow-Origin', '*');
-//   res.send(Buffer.from(buffer));
-// });
-
 
 router.get('/ticket-pdf/:confirmationNumber', async (req, res) => {
   try {
@@ -114,7 +120,7 @@ router.get('/ticket-pdf/:confirmationNumber', async (req, res) => {
     doc.fontSize(14).text(title, 0, currentY, { align: 'center', width: 360 });
     currentY += 15;
 
-    // Draw QR code bigger
+    // Draw QR code
     const qrDataURL = await QRCode.toDataURL(confirmationNumber, { width: 250 });
     doc.image(qrDataURL, 50, currentY, { width: 250, height: 250 });
     currentY += 250;
@@ -183,7 +189,5 @@ router.get("/validate-ticket/:confirmationNumber", async (req, res) => {
     return res.status(500).json({ valid: false, message: `Internal Server Error: ${err.message}` });
   }
 });
-
-
 
 export default router;

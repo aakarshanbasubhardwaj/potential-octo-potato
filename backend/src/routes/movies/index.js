@@ -4,9 +4,13 @@ import topRatedMovie from '../../../db/models/topRatedMovieModel.js';
 import trendingMovie from '../../../db/models/trendingMovieModel.js';
 import dbOperations from "../../../db/methods/dbOperations.js";
 import movieGenres from '../../../db/models/movieGenres.js';
-import searchResultsModel from '../../../db/models/searchResultsModel.js';
+import axios from 'axios';
+import config from "../../config/config.js";
+import movieRuntimeCache from "../../../db/models/movieRuntimeCache.js";
 
 const router = Router();
+
+const { TMDB_API_KEY, TMDB_BASE_URL } = config
 
 router.get('/getMovie', async (req, res) => {
   try {
@@ -62,17 +66,17 @@ router.get('/getMovie', async (req, res) => {
       genresList.forEach(g => {
         genreMap[g.id] = g.name;
       });
-      const moviesWithGenreNames = movies.map(movie => ({
-        ...movie,
-        genres: movie.genre_ids.map(id => genreMap[id] || "Unknown")
-      }));
+    const moviesWithGenreNames = movies.map(movie => ({
+      ...movie,
+      genres: movie.genre_ids.map(id => genreMap[id] || "Unknown")
+    }));
 
-      return res.status(200).json({
-        currentPage: page,
-        totalPages: Math.ceil(totalCount / limit),
-        totalResults: totalCount,
-        results: moviesWithGenreNames
-      });
+    return res.status(200).json({
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+      totalResults: totalCount,
+      results: moviesWithGenreNames
+    });
   } catch (err) {
     console.error(`Error fetching ${req.query.model} movies:`, err);
     return res.status(500).json({ error: 'Server error' });
@@ -98,11 +102,6 @@ router.get("/getMovieById", async(req, res) => {
       if(!result){
         return res.status(404).json({ message: "Movie not found" });
       }
-    } else if (requestedModel === 'search'){
-      result = await dbOperations.getOne(searchResultsModel, {_id : req.query.id});
-      if(!result){
-        return res.status(404).json({ message: "Movie not found" });
-      }
     } else {
       return res.status(400).json({ error: 'Incorrect parameters' });
     }
@@ -112,7 +111,21 @@ router.get("/getMovieById", async(req, res) => {
     genresList.forEach(g => {
       genreMap[g.id] = g.name;
     });
-    
+
+    const cachedRuntime = await dbOperations.getOne(movieRuntimeCache, { id: result.id });
+    if (cachedRuntime) {
+      result.runtime = cachedRuntime.runtime;
+    } else {
+      const runtimeResponse = await axios.get(`${TMDB_BASE_URL}/movie/${result.id}`, {
+        params: { api_key: TMDB_API_KEY, language: "en-US" },
+      });
+      result.runtime = runtimeResponse.data.runtime || null;
+        await dbOperations.insertOne(movieRuntimeCache, {
+          id: result.id,
+          runtime: result.runtime,
+        });
+    }    
+
     result.genres = result.genre_ids.map(id => genreMap[id] || "Unknown")
 
     return res.status(200).json(result);

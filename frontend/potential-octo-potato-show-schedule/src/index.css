@@ -17,6 +17,6 @@ html, body, #root {
   padding: 0;
   height: 100%;
   width: 100%;
-  overflow: hidden; /* prevent scrollbars */
+  overflow: hidden;
   background-color: black;
 }

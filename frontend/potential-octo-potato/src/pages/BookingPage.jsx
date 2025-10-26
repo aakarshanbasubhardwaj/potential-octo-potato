@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, Button, Typography, CircularProgress  } from '@mui/material';
+import { Box, Button, Typography, CircularProgress, Dialog, DialogContent, DialogTitle, IconButton  } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import MovieBox from '../components/MovieBox.jsx';
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function BookingPage() {
   const theme = useTheme();  
   const location = useLocation();
   const navigate = useNavigate();
   const movie = location.state?.movie;
+  const model = location.state?.model;
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
@@ -20,6 +22,26 @@ export default function BookingPage() {
 
   const [loading, setLoading] = useState(false);
   const [bgLoaded, setBgLoaded] = useState(false); 
+  const [blockedSlots, setBlockedSlots] = useState([]);
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+
+  useEffect(() => {
+    const fetchBlockedSlots = async () => {
+      if (!selectedDate) return;
+      try {
+        const res = await fetch(`http://localhost:3333/bookings/unavailableTimes?date=${selectedDate}`);
+        const data = await res.json();
+        setBlockedSlots(data.blockedSlots || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchBlockedSlots();
+  }, [selectedDate]);
+
+
 
   const handleConfirmBooking = async () => {
     setLoading(true);
@@ -33,7 +55,10 @@ export default function BookingPage() {
             time: selectedTime,
             tickets,
             poster_path: movie.poster_path,
-            backdrop_path: movie.backdrop_path
+            backdrop_path: movie.backdrop_path,
+            runtime: movie.runtime || 60,
+            id: movie.id,
+            type: model,
         }),
         });
 
@@ -43,11 +68,13 @@ export default function BookingPage() {
         navigate(`/confirmation/${data.confirmationNumber}`, { replace: true });
         } else {
         console.error(data.error);
-        alert('Booking failed: ' + data.error);
+        setErrorMessage('Booking failed: ' + data.error || 'Unknown Error');
+        setErrorDialogOpen(true);
         }
     } catch (err) {
-        console.error(err);
-        alert('Booking failed: ' + err.message);
+        console.error(err);    
+        setErrorMessage('Booking failed: ' + err.message);
+        setErrorDialogOpen(true);
     } finally {
         setLoading(false);
     }
@@ -86,10 +113,13 @@ const formatDate = (d) =>
 
     const now = new Date();
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    const closestIndex = times.findIndex((t) => {
+    let closestIndex = times.findIndex((t) => {
       const [h, m] = t.split(':').map(Number);
-      return h * 60 + m >= currentMinutes;
+      return h * 60 + m >= currentMinutes && !blockedSlots.includes(t);
     });
+    if (closestIndex === -1) {
+      closestIndex = times.findIndex((t) => !blockedSlots.includes(t));
+    }
     setSelectedTime(times[closestIndex] || times[0]);
   }, []);
 
@@ -133,7 +163,29 @@ const formatDate = (d) =>
   const incrementTickets = () => tickets < 10 && setTickets(tickets + 1);
   const decrementTickets = () => tickets > 2 && setTickets(tickets - 1);
 
-  const renderVerticalPicker = (items, selected, setSelected, containerRef, formatItem, itemRefs) => (
+  const isPastSlot = (dateStr, time) => {
+    const [monthStr, day, year] = dateStr.replace(',', '').split(' '); // "Oct 26, 2025" -> ["Oct", "26", "2025"]
+    const month = new Date(`${monthStr} 1, 2000`).getMonth(); // Convert month short name to index
+    const slotDate = new Date(year, month, day);
+    
+    const now = new Date();
+
+    if (
+      slotDate.getFullYear() === now.getFullYear() &&
+      slotDate.getMonth() === now.getMonth() &&
+      slotDate.getDate() === now.getDate()
+    ) {
+      const [h, m] = time.split(':').map(Number);
+      const slotMinutes = h * 60 + m;
+      const nowMinutes = now.getHours() * 60 + now.getMinutes();
+      return slotMinutes < nowMinutes;
+    }
+
+    return false; // Future dates are never past
+  };
+
+
+  const renderVerticalPicker = (items, selected, setSelected, containerRef, formatItem, itemRefs, isTimePicker = false) => (
     <Box
         ref={containerRef}
         sx={{
@@ -154,28 +206,33 @@ const formatDate = (d) =>
         {items.map((item, i) => {
         const val = formatItem ? formatItem(item) : item;
         const isSelected = selected === val;
+        const isBlocked = isTimePicker && (blockedSlots.includes(val) || isPastSlot(selectedDate, val));
         return (
             <Box
             key={i}
             ref={(el) => itemRefs?.current && (itemRefs.current[i] = el)}
-            onClick={() => setSelected(val)}
+            onClick={() => !isBlocked && setSelected(val)}
             sx={{
                 scrollSnapAlign: 'center',
                 py: 1.5,
                 px: 4,
                 borderRadius: 6,
-                cursor: 'pointer',
+                cursor: isBlocked ? 'not-allowed' : 'pointer',
                 mb: 1,
                 width: '90%',
                 maxWidth: '400px',
                 textAlign: 'center',
                 fontWeight: isSelected ? 'bold' : 'medium',
-                color: isSelected ? '#fff' : '#ddd',
+                color: isBlocked
+                  ? '#888'
+                  : isSelected
+                  ? '#fff'
+                  : '#ddd',
                 background: isSelected
                 ? theme.palette.primary.main
                 : 'rgba(255,255,255,0.05)',
                 boxShadow: isSelected
-                ? `0 4px 15px ${theme.palette.primary.main}33` // slight shadow using primary
+                ? `0 4px 15px ${theme.palette.primary.main}33`
                 : 'none',
                 transition: 'all 0.3s ease',
                 '&:hover': {
@@ -259,7 +316,7 @@ const formatDate = (d) =>
       }}
     >
       {renderVerticalPicker(dates, selectedDate, setSelectedDate, dateRef, formatDate, dateItemRefs)}
-      {renderVerticalPicker(times, selectedTime, setSelectedTime, timeRef)}
+      {renderVerticalPicker(times, selectedTime, setSelectedTime, timeRef, null, null, true)}
     </Box>
 
     {/* Ticket picker */}
@@ -353,6 +410,41 @@ const formatDate = (d) =>
         )}
       </Button>
     </Box>
+    <Dialog
+      open={errorDialogOpen}
+      onClose={() => setErrorDialogOpen(false)}
+      maxWidth="xs"
+      fullWidth
+    >
+      <DialogTitle
+        sx={{
+          bgcolor: 'error.main',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          pr: 1, // make space for the icon
+        }}
+      >
+        <Typography variant="h6">Error</Typography>
+        <IconButton
+          edge="end"
+          color="inherit"
+          onClick={() => setErrorDialogOpen(false)}
+          size="small"
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+
+      <DialogContent dividers sx={{ bgcolor: 'background.paper' }}>
+        <Typography variant="body1" color="textPrimary">
+          {errorMessage}
+        </Typography>
+      </DialogContent>
+    </Dialog>
+
+
   </Box>
 
   );

@@ -47,7 +47,6 @@ router.post('/multi', async (req, res) => {
         results: moviesWithGenreNames
       });
 
-    // return res.status(200).json({ returnResponse });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal Server Error' });
@@ -56,15 +55,13 @@ router.post('/multi', async (req, res) => {
 
 router.get("/getSearchById", async(req, res) => {
   try {
-    // const requestedModel = req.query.model;
     let result;
 
     result = await dbOperations.getOne(searchResult, {_id : req.query.id});
     if(!result){
       return res.status(404).json({ message: "Search item not found" });
     }
-
-
+    
     const genresList = await movieGenres.find({}).lean();
     const genreMap = {};
     genresList.forEach(g => {

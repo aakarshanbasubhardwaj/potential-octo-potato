@@ -8,4 +8,3 @@ const tvGenresSchema = new mongoose.Schema({
 const tvGenres = mongoose.model('tvGenres', tvGenresSchema);
 
 export default tvGenres;
-

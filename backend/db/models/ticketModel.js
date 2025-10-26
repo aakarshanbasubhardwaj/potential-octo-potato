@@ -8,6 +8,7 @@ const ticketSchema = new mongoose.Schema({
   confirmationNumber: { type: String, required: true, unique: true },
   poster_path: { type: String },
   backdrop_path: { type: String },
+  runtime: {type: String},
   validated: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });

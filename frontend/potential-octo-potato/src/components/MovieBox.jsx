@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 
 export default function MovieBox({ movie }) {
-  const { title, poster_path, release_date, vote_average, vote_count } = movie;
+  const { title, poster_path, runtime, vote_average, vote_count } = movie;
 
   return (
     
@@ -33,9 +33,9 @@ export default function MovieBox({ movie }) {
             <Typography variant="caption" color="#ddd" sx={{ mt: 1 }}>
                 {movie.genres.join(' ')}
             </Typography>
-            <Typography variant="caption" sx={{ color: '#ddd' }}>
-             {release_date}{/* • {runtime} min */}
-            </Typography>
+            {runtime ? <Typography variant="caption" sx={{ color: '#ddd' }}>
+             {runtime} mins{/* • {runtime} min */}
+            </Typography> :null }
             <Typography variant="caption" sx={{ color: '#ddd' }}>
             {vote_average.toFixed(1)} ⭐ ({vote_count} Votes)
             </Typography>

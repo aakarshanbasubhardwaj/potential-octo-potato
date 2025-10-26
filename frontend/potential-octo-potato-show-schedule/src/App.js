@@ -183,7 +183,20 @@ export default function App() {
                 color: "#fff",
               }}
             >
-              {show.time}
+              {(() => {
+                if (!show.time || !show.runtime) return show.time;
+
+                const [h, m] = show.time.split(':').map(Number);
+                const start = new Date();
+                start.setHours(h, m, 0, 0);
+
+                const end = new Date(start.getTime() + show.runtime * 60000);
+
+                const formatTime = (d) =>
+                  `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+
+                return `${formatTime(start)} - ${formatTime(end)}`;
+              })()}
             </Typography>
           </motion.div>
           <style>

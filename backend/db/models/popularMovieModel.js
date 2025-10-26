@@ -20,4 +20,3 @@ const popularMovieSchema = new mongoose.Schema({
 const popularMovie = mongoose.model('popularMovie', popularMovieSchema);
 
 export default popularMovie;
-

@@ -20,4 +20,3 @@ const trendingMovieModel = new mongoose.Schema({
 const trendingMovie = mongoose.model('trendingMovie', trendingMovieModel);
 
 export default trendingMovie;
-

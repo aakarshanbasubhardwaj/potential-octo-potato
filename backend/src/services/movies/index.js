@@ -13,7 +13,6 @@ async function getMovieGenres() {
   try {
     let allMovieGenres = [];
 
-
     const response = await axios.get(`${TMDB_BASE_URL}/genre/movie/list?language=en`, {
       params: { api_key: TMDB_API_KEY, language: 'en-US', region: REGION },
     });
@@ -23,14 +22,12 @@ async function getMovieGenres() {
 
     if (fetchedMovieGenres.length > 0) allMovieGenres.push(...fetchedMovieGenres);
 
-    
-
     if (allMovieGenres.length > 0) {
       // Delete existing records
       await dbOperations.deleteMany(movieGenres);
       console.log('Existing movie genres deleted.');
 
-      // Insert all new movies
+      // Insert new records
       await dbOperations.insertMany(movieGenres, allMovieGenres);
       console.log('New movie genres stored!');
     } else {

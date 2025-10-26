@@ -7,6 +7,7 @@ import tv from './routes/tvShows/index.js';
 import search from './routes/search/index.js';
 import checkModelsAndLoadData from './services/index.js';
 import nextShow from './routes/nextShow/index.js';
+import bookings from './routes/booking/index.js'
 
 const app = express();
 app.use(cors())
@@ -23,6 +24,7 @@ app.use("/tickets", tickets);
 app.use("/tv", tv);
 app.use("/search", search);
 app.use("/nextShow", nextShow);
+app.use("/bookings", bookings);
 
 await conn.connectToDatabase();
 

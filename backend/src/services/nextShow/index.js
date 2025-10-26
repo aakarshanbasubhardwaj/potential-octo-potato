@@ -1,47 +1,48 @@
-import Ticket from "../../../db/models/ticketModel.js";
+import Booking from "../../../db/models/bookingModel.js";
 import dbOperations from "../../../db/methods/dbOperations.js";
 
 export async function getNextShow(req, res) {
   try {
     const now = new Date();
-    const tickets = await dbOperations.getAll(Ticket);
+    const bookings = await dbOperations.getAll(Booking);
 
-    if (!tickets || tickets.length === 0)
+    if (!bookings || bookings.length === 0)
       return res.status(200).json({ currentShow: null, nextShow: null });
 
-    const ticketsWithDate = tickets.map(ticket => ({
-      ...ticket,
-      showDateTime: new Date(`${ticket.date} ${ticket.time}`)
+    const bookingsWithDate = bookings.map(b => ({
+      ...b,
+      showDateTime: new Date(`${b.date} ${b.time}`),
     }));
 
-    ticketsWithDate.sort((a, b) => a.showDateTime - b.showDateTime);
-    const SHOW_DURATION_MINS = 120;
+    bookingsWithDate.sort((a, b) => a.showDateTime - b.showDateTime);
 
     let currentShow = null;
     let nextShow = null;
 
-    for (let i = 0; i < ticketsWithDate.length; i++) {
-      const t = ticketsWithDate[i];
-      const showStart = t.showDateTime;
-      const showEnd = new Date(showStart.getTime() + SHOW_DURATION_MINS * 60000);
+    for (const b of bookingsWithDate) {
+      const showStart = b.showDateTime;
+      const durationMins = b.runtime;
+      const showEnd = new Date(showStart.getTime() + durationMins * 60000);
 
       if (now >= showStart && now <= showEnd) {
         currentShow = {
-          title: t.title,
-          date: t.date,
-          time: t.time,
-          poster_path: t.poster_path,
-          backdrop_path: t.backdrop_path,
+          title: b.title,
+          date: b.date,
+          time: b.time,
+          poster_path: b.poster_path,
+          backdrop_path: b.backdrop_path,
+          runtime: b.runtime
         };
       }
 
       if (showStart > now) {
         nextShow = {
-          title: t.title,
-          date: t.date,
-          time: t.time,
-          poster_path: t.poster_path,
-          backdrop_path: t.backdrop_path,
+          title: b.title,
+          date: b.date,
+          time: b.time,
+          poster_path: b.poster_path,
+          backdrop_path: b.backdrop_path,
+          runtime: b.runtime
         };
         break;
       }
@@ -51,9 +52,8 @@ export async function getNextShow(req, res) {
       currentShow: currentShow,
       nextShow: nextShow
     });
-
   } catch (err) {
     console.error("Error fetching show status:", err);
-    return res.status(500).json({ message: `Internal Server Error: ${err.message}` });
+    return ({ message: `Internal Server Error: ${err.message}` });
   }
 }
