@@ -1,26 +1,26 @@
 ###
-GET http://localhost:3333/test
+GET http://10.0.0.1:3333/test
 
 ###
-GET http://localhost:3333/movies/popular?page=2
+GET http://10.0.0.1:3333/movies/popular?page=2
 
 ###
-GET http://localhost:3333/movies/getPopularMovieById?id=68f280d6810d65006ccefb73
+GET http://10.0.0.1:3333/movies/getPopularMovieById?id=68f280d6810d65006ccefb73
 
 ###
-GET http://localhost:3333/tickets/getTicket/8E494C66
+GET http://10.0.0.1:3333/tickets/getTicket/8E494C66
 
 ###
-GET http://localhost:3333/tickets/getAllTickets/
+GET http://10.0.0.1:3333/tickets/getAllTickets/
 
 ###
-GET http://localhost:3333/tv/getTv?model=topRatedTv&page=1
+GET http://10.0.0.1:3333/tv/getTv?model=topRatedTv&page=1
 
 ###
-GET http://localhost:3333/tickets/validate-ticket/F70BFBF8
+GET http://10.0.0.1:3333/tickets/validate-ticket/F70BFBF8
 
 ###
-GET http://localhost:3333/tickets/validate-ticket/FBE08827
+GET http://10.0.0.1:3333/tickets/validate-ticket/FBE08827
 
 ###
-GET http://localhost:3333/nextShow/showSchedule
+GET http://10.0.0.1:3333/nextShow/showSchedule

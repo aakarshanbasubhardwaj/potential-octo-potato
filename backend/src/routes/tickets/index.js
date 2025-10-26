@@ -176,8 +176,6 @@ router.get("/validate-ticket/:confirmationNumber", async (req, res) => {
       const diffMs = showDateTime - now;
       const diffMins = diffMs / (1000 * 60);
 
-      console.log(diffMins)
-
       if (diffMins > 30)
         return res.status(403).json({ valid: false, message: "Ticket can only be validated 30 minutes before show time." });
 

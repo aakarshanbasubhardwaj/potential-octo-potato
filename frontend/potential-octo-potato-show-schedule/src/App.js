@@ -109,7 +109,7 @@ export default function App() {
             transition: "transform 15s ease-in-out",
             "&:hover": { transform: "scale(1.05)" },
           }}
-          image={imageBase + (show.backdrop_path || show.poster_path)}
+          image={imageBase + (show?.backdrop_path || show?.poster_path)}
           alt={show.title}
         />
         <CardContent
@@ -138,14 +138,14 @@ export default function App() {
                 fontWeight: 900,
                 letterSpacing: 3,
                 textTransform: "uppercase",
-                color: showType === "current" ? "#FFD700" : "#00FFFF",
+                color: label === "Now Showing"  ? "#FFD700" : "#00FFFF",
                 textShadow:
-                  showType === "current"
+                  label === "Now Showing" 
                     ? "0 0 15px rgba(255,215,0,1), 0 0 30px rgba(255,215,0,0.7)"
                     : "0 0 15px rgba(0,255,255,0.8), 0 0 30px rgba(0,255,255,0.5)",
                 mb: 2,
                 animation:
-                  showType === "current"
+                  label === "Now Showing" 
                     ? "pulseGlow 2s infinite"
                     : "flickerNeon 1.5s infinite",
               }}
@@ -228,22 +228,39 @@ export default function App() {
       </Typography>
     );
   else {
-    const activeShow = showType === "current" ? data.currentShow : data.nextShow;
-    const label = showType === "current" ? "Now Showing" : "Next Up";
-    content = (
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={label}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1 }}
-        >
-          {renderShowCard(activeShow, label)}
-        </motion.div>
-      </AnimatePresence>
-    );
+    let activeShow, label;
+
+    if (data.currentShow) {
+      activeShow = showType === "current" ? data.currentShow : data.nextShow;
+      label = showType === "current" ? "Now Showing" : "Next Up";
+    } else if (data.nextShow) {
+      activeShow = data.nextShow;
+      label = "Next Up";
+    }
+
+    if (!activeShow) {
+      content = (
+        <Typography variant="h4" align="center">
+          No shows scheduled currently.
+        </Typography>
+      );
+    } else {
+      content = (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={label}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
+          >
+            {renderShowCard(activeShow, label)}
+          </motion.div>
+        </AnimatePresence>
+      );
+    }
   }
+
 
   return (
     <Box

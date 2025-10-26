@@ -12,3 +12,10 @@ sudo timedatectl set-timezone Europe/Berlin
 
 logos inindex.html
 cors
+
+all readmes update
+add local developement
+look into qr code reading for the validator app
+add liscense
+create docker containers
+check mongo db for the app

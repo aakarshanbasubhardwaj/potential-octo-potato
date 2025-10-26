@@ -44,7 +44,7 @@ async function loadInitialData(){
 }
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server Running on http://localhost:${PORT}`);
+    console.log(`Server Running on http://10.0.0.1:${PORT}`);
 });
 
 loadInitialData()
