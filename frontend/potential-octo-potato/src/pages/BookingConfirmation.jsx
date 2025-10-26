@@ -15,7 +15,7 @@ export default function BookingConfirmation() {
   useEffect(() => {
     const fetchTicket = async () => {
       try {
-        const res = await fetch(`http://localhost:3333/tickets/getTicket/${confirmationNumber}`);
+        const res = await fetch(`http://10.0.0.1:3333/tickets/getTicket/${confirmationNumber}`);
         if (!res.ok) throw new Error('Ticket not found');
         const data = await res.json();
         setTicket(data);

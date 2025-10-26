@@ -16,7 +16,7 @@ export default function SearchBox({ onSearch }) {
   const handleSearch = async () => {
     try {
       if(query){
-        const res = await fetch('http://localhost:3333/search/multi', {
+        const res = await fetch('http://10.0.0.1:3333/search/multi', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

@@ -30,7 +30,7 @@ export default function MovieDetails() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://localhost:3333/${itemType}/${endpoint}?id=${id}&model=${model}`)
+    fetch(`http://10.0.0.1:3333/${itemType}/${endpoint}?id=${id}&model=${model}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch movie details');
         return res.json();

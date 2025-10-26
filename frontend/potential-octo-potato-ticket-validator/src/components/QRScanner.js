@@ -48,7 +48,7 @@ export default function TicketScanner() {
 
             try {
               const res = await axios.get(
-                `http://localhost:3333/tickets/validate-ticket/${extracted}`
+                `http://10.0.0.1:3333/tickets/validate-ticket/${extracted}`
               );
               setResponseMessage(res.data.message);
               setFlash("success");

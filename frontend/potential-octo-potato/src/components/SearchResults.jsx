@@ -11,7 +11,7 @@ export default function SearchResults({ searchTerm, model, initialResults = [] }
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:3333/search/multi', {
+      const res = await fetch('http://10.0.0.1:3333/search/multi', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ searchTerm, page: page + 1 }),

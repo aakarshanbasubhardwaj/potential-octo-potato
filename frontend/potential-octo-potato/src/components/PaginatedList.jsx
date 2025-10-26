@@ -25,7 +25,7 @@ export default function PaginatedList({ title, model, itemType, CardComponent = 
 
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:3333/${itemType}/${endpoint}/?page=${page}&model=${model}`);
+      const res = await fetch(`http://10.0.0.1:3333/${itemType}/${endpoint}/?page=${page}&model=${model}`);
       const data = await res.json();
       movieCache[cacheKey] = data;
 

@@ -25,7 +25,7 @@ export default function App() {
 
   const fetchSchedule = async () => {
     try {
-      const res = await fetch("http://localhost:3333/nextShow/showSchedule");
+      const res = await fetch("http://10.0.0.1:3333/nextShow/showSchedule");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       setData(json);

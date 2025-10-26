@@ -136,7 +136,7 @@ export default function Ticket({ ticket }) {
           color="primary"
           startIcon={<DownloadRoundedIcon />}
           onClick={() => {
-            window.open(`http://localhost:3333/tickets/ticket-pdf/${ticket.confirmationNumber}`, '_blank');
+            window.open(`http://10.0.0.1:3333/tickets/ticket-pdf/${ticket.confirmationNumber}`, '_blank');
           }}
         >
           Download PDF

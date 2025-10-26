@@ -31,7 +31,7 @@ export default function BookingPage() {
     const fetchBlockedSlots = async () => {
       if (!selectedDate) return;
       try {
-        const res = await fetch(`http://localhost:3333/bookings/unavailableTimes?date=${selectedDate}`);
+        const res = await fetch(`http://10.0.0.1:3333/bookings/unavailableTimes?date=${selectedDate}`);
         const data = await res.json();
         setBlockedSlots(data.blockedSlots || []);
       } catch (err) {
@@ -46,7 +46,7 @@ export default function BookingPage() {
   const handleConfirmBooking = async () => {
     setLoading(true);
     try {
-        const res = await fetch('http://localhost:3333/tickets/createTicket', {
+        const res = await fetch('http://10.0.0.1:3333/tickets/createTicket', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
