@@ -7,7 +7,7 @@ export async function getNextShow(req, res) {
     const bookings = await dbOperations.getAll(Booking);
 
     if (!bookings || bookings.length === 0)
-      return res.status(200).json({ currentShow: null, nextShow: null });
+      return ({ currentShow: null, nextShow: null });
 
     const bookingsWithDate = bookings.map(b => ({
       ...b,
