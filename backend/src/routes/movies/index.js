@@ -135,12 +135,9 @@ router.get("/getMovieById", async(req, res) => {
         params: { api_key: TMDB_API_KEY, language: "en-US" },
       });
       
-      const regionalProvider = providerResponse.data.results?.[REGION]?.flatrate?.filter(obj => obj.display_priority === 1)[0];
+      const regionalProvider = providerResponse.data.results?.[REGION]?.flatrate;
 
-      result.provider = regionalProvider ? {
-        logo : regionalProvider.logo_path,
-        provider_name: regionalProvider.provider_name
-      } : "Provider data unavailable"
+      result.provider = regionalProvider ? regionalProvider : "Streaming data unavailable"
       await dbOperations.insertOne(watchProviderCache, {
         id: result.id,
         provider: result.provider,

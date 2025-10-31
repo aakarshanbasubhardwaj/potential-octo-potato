@@ -4,8 +4,13 @@ import popularTvShow from '../../../db/models/popularTvShowsModel.js';
 import topRatedTvShow from '../../../db/models/topRatedTvShowsModel.js';
 import trendingTvShow from '../../../db/models/trendingTvShowModel.js';
 import tvGenres from '../../../db/models/tvGenres.js';
+import watchProviderCache from "../../../db/models/watchProviderCache.js";
+import config from "../../config/config.js";
+import axios from 'axios';
 
 const router = Router();
+
+const { TMDB_API_KEY, TMDB_BASE_URL, REGION } = config
 
 router.get('/getTv', async (req, res) => {
   try {
@@ -107,6 +112,23 @@ router.get("/getTvById", async(req, res) => {
     genresList.forEach(g => {
       genreMap[g.id] = g.name;
     });
+
+    const cachedProvider = await dbOperations.getOne(watchProviderCache, { id: result.id });
+    if (cachedProvider) {
+      result.provider = cachedProvider.provider;
+    } else {
+      const providerResponse = await axios.get(`${TMDB_BASE_URL}/tv/${result.id}/watch/providers`, {
+        params: { api_key: TMDB_API_KEY, language: "en-US" },
+      });
+      
+      const regionalProvider = providerResponse.data.results?.[REGION]?.flatrate;
+
+      result.provider = regionalProvider ? regionalProvider : "Streaming data unavailable"
+      await dbOperations.insertOne(watchProviderCache, {
+        id: result.id,
+        provider: result.provider,
+      });
+    } 
     
     result.genres = result.genre_ids.map(id => genreMap[id] || "Unknown")
     result.title = result.name;

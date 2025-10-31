@@ -101,6 +101,52 @@ export default function MovieDetails() {
           <Typography sx={{ textAlign: 'justify', lineHeight: 1.6 }}>
             {movie.overview}
           </Typography>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Box sx={{ mt: 1 }}>
+            {movie.provider.length > 0 &&typeof movie.provider[0] === "object" &&
+            <Typography
+              variant="overline"
+              sx={{
+                letterSpacing: 0.5,
+                color: "text.secondary",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                mb: 1,
+              }}
+            >
+              Now Streaming
+            </Typography>}
+            
+            {Array.isArray(movie.provider) &&
+            movie.provider.length > 0 &&
+            typeof movie.provider[0] === "object" ? (
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                {movie.provider.map((prov) => (
+                  <Box
+                    key={prov.provider_id}
+                    component="img"
+                    src={`https://image.tmdb.org/t/p/w92${prov.logo_path}`}
+                    alt={prov.provider_name}
+                    title={prov.provider_name}
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: "50%",
+                      objectFit: "contain",
+                      p: 0.5,
+                    }}
+                  />
+                ))}
+              </Box>
+            ) : (
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                Streaming data unavailable
+              </Typography>
+            )}
+          </Box>
+
         </Box>
       </Container>
 
