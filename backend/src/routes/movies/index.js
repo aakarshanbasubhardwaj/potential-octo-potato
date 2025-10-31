@@ -7,10 +7,11 @@ import movieGenres from '../../../db/models/movieGenres.js';
 import axios from 'axios';
 import config from "../../config/config.js";
 import movieRuntimeCache from "../../../db/models/movieRuntimeCache.js";
+import watchProviderCache from "../../../db/models/watchProviderCache.js";
 
 const router = Router();
 
-const { TMDB_API_KEY, TMDB_BASE_URL } = config
+const { TMDB_API_KEY, TMDB_BASE_URL, REGION } = config
 
 router.get('/getMovie', async (req, res) => {
   try {
@@ -120,11 +121,31 @@ router.get("/getMovieById", async(req, res) => {
         params: { api_key: TMDB_API_KEY, language: "en-US" },
       });
       result.runtime = runtimeResponse.data.runtime || null;
-        await dbOperations.insertOne(movieRuntimeCache, {
-          id: result.id,
-          runtime: result.runtime,
-        });
+      await dbOperations.insertOne(movieRuntimeCache, {
+        id: result.id,
+        runtime: result.runtime,
+      });
     }    
+
+    const cachedProvider = await dbOperations.getOne(watchProviderCache, { id: result.id });
+    if (cachedProvider) {
+      result.provider = cachedProvider.provider;
+    } else {
+      const providerResponse = await axios.get(`${TMDB_BASE_URL}/movie/${result.id}/watch/providers`, {
+        params: { api_key: TMDB_API_KEY, language: "en-US" },
+      });
+      
+      const regionalProvider = providerResponse.data.results?.[REGION]?.flatrate?.filter(obj => obj.display_priority === 1)[0];
+
+      result.provider = regionalProvider ? {
+        logo : regionalProvider.logo_path,
+        provider_name: regionalProvider.provider_name
+      } : "Provider data unavailable"
+      await dbOperations.insertOne(watchProviderCache, {
+        id: result.id,
+        provider: result.provider,
+      });
+    } 
 
     result.genres = result.genre_ids.map(id => genreMap[id] || "Unknown")
 
