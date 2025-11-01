@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  backend:
+    image: aakarshanbasubhardwaj/popbackend:latest
+    container_name: popbackend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI_PROD=mongodb://{DB_USER}:{DB_USER_PASSWORD}@mongo:27017/potential-octo-potato?authSource=potential-octo-potato
+    networks: 
+      - pop-net
+  frontend:
+    image: aakarshanbasubhardwaj/popfrontend:latest
+    container_name: popfrontend
+    restart: unless-stopped
+    networks: 
+      - pop-net
+  pop-show-schedule:
+    image: aakarshanbasubhardwaj/pop-show-schedule:latest
+    container_name: pop-show-schedule
+    restart: unless-stopped
+    networks:
+      - pop-net
+  pop-ticket-validator:
+    image: aakarshanbasubhardwaj/pop-ticket-validator:latest
+    container_name: pop-ticket-validator
+    restart: unless-stopped
+    networks:
+      - pop-net
+networks:
+  pop-net:
+    external: true

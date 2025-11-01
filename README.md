@@ -1,5 +1,30 @@
-look into qr code reading for the validator app
+creata netwrok - docker network create pop-net
+add mongo db to this network
+create a user in pop db 
+give cred in env in compose
 
+look into qr code reading for the validator app
+create .env ansd pop with the content
+server ip or monmgodb container name
+docker compose uri from ongo in backend "mongodb://popuser:popUser@123@10.0.0.1:27017/potential-octo-potato?authSource=potential-octo-potato"
+and env environment:
+  - NODE_ENV=production
+  - MONGO_URI_PROD=mongodb://popuser:app_password_here@10.0.0.1:27017/potential-octo-potato?authSource=potential-octo-potato
+
+# 1. Build the image and name it 'pop:latest'
+docker build -t pop:latest .
+
+# 2. Tag it for Docker Hub
+docker tag pop:latest yourusername/pop:latest
+
+# 3. Log in to Docker Hub
+docker login
+
+# 4. Push the image
+docker push yourusername/pop:latest
+
+# 5. (Optional) Pull elsewhere to verify
+docker pull yourusername/pop:latest
 
 dynamic port mapping for each app 
 
@@ -534,9 +559,6 @@ This setup means no source code is required on prod, Nginx config is mostly stat
 If you want, I can also show how to adjust the Dockerfiles for the frontend apps so they build into the Nginx image properly, ready for this setup.
 
 Do you want me to do that next?
-
-
-------------------------------------
 # 🎬 POP (potential-octo-potato)
 
 # 📑 Table of Contents

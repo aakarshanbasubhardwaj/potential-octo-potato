@@ -3,6 +3,7 @@ import { Box, Typography, Divider, Button } from '@mui/material';
 import { QRCodeSVG } from 'qrcode.react';
 import ReplyRoundedIcon from '@mui/icons-material/ReplyRounded';
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
+import {API_BASE_URL} from '../config/config.js';
 
 export default function Ticket({ ticket }) {
   const { title, date, time, tickets, confirmationNumber, backdrop_path } = ticket;
@@ -136,7 +137,7 @@ export default function Ticket({ ticket }) {
           color="primary"
           startIcon={<DownloadRoundedIcon />}
           onClick={() => {
-            window.open(`http://10.0.0.1:3333/tickets/ticket-pdf/${ticket.confirmationNumber}`, '_blank');
+            window.open(`${API_BASE_URL}/tickets/ticket-pdf/${ticket.confirmationNumber}`, '_blank');
           }}
         >
           Download PDF

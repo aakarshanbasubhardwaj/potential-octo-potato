@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Box, Button, Dialog, DialogContent, DialogTitle, IconButton , CircularProgress} from '@mui/material';
 import Ticket from '../components/Ticket.jsx'
 import CloseIcon from '@mui/icons-material/Close';
+import {API_BASE_URL} from '../config/config.js';
+
 
 export default function BookingConfirmation() {
   const { confirmationNumber } = useParams();
@@ -15,7 +17,7 @@ export default function BookingConfirmation() {
   useEffect(() => {
     const fetchTicket = async () => {
       try {
-        const res = await fetch(`http://10.0.0.1:3333/tickets/getTicket/${confirmationNumber}`);
+        const res = await fetch(`${API_BASE_URL}/tickets/getTicket/${confirmationNumber}`);
         if (!res.ok) throw new Error('Ticket not found');
         const data = await res.json();
         setTicket(data);

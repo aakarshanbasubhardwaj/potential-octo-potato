@@ -9,6 +9,8 @@ import {
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || '/pop/api';
+
 export default function App() {
   const [data, setData] = useState(null);
   const [showType, setShowType] = useState("current");
@@ -25,7 +27,7 @@ export default function App() {
 
   const fetchSchedule = async () => {
     try {
-      const res = await fetch("http://10.0.0.1:3333/nextShow/showSchedule");
+      const res = await fetch(`${API_BASE_URL}/nextShow/showSchedule`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       setData(json);

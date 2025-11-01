@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Box, InputBase, Paper, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
+import {API_BASE_URL} from '../config/config.js';
+
 
 export default function SearchBox({ onSearch }) {
   const [query, setQuery] = useState('');
@@ -16,7 +18,7 @@ export default function SearchBox({ onSearch }) {
   const handleSearch = async () => {
     try {
       if(query){
-        const res = await fetch('http://10.0.0.1:3333/search/multi', {
+        const res = await fetch(`${API_BASE_URL}/search/multi`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

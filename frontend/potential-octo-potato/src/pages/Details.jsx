@@ -10,6 +10,7 @@ import {
   Paper,
 } from '@mui/material';
 import MovieImage from '../components/MovieImage';
+import {API_BASE_URL} from '../config/config.js';
 
 export default function MovieDetails() {
   const { id, model } = useParams();
@@ -30,7 +31,7 @@ export default function MovieDetails() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://10.0.0.1:3333/${itemType}/${endpoint}?id=${id}&model=${model}`)
+    fetch(`${API_BASE_URL}/${itemType}/${endpoint}?id=${id}&model=${model}`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch movie details');
         return res.json();

@@ -11,6 +11,7 @@ import {
   AccordionDetails,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {API_BASE_URL} from '../config/config.js';
 import { useNavigate } from 'react-router-dom';
 
 export default function BookingHistory() {
@@ -21,7 +22,7 @@ export default function BookingHistory() {
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const res = await fetch('http://10.0.0.1:3333/tickets/getAllTickets/');
+        const res = await fetch(`${API_BASE_URL}/tickets/getAllTickets/`);
         if (!res.ok) throw new Error('Failed to fetch tickets');
         const data = await res.json();
 

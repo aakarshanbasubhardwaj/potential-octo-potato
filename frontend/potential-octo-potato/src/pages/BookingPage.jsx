@@ -4,6 +4,7 @@ import { Box, Button, Typography, CircularProgress, Dialog, DialogContent, Dialo
 import { useTheme } from '@mui/material/styles';
 import MovieBox from '../components/MovieBox.jsx';
 import CloseIcon from '@mui/icons-material/Close';
+import {API_BASE_URL} from '../config/config.js';
 
 export default function BookingPage() {
   const theme = useTheme();  
@@ -31,7 +32,7 @@ export default function BookingPage() {
     const fetchBlockedSlots = async () => {
       if (!selectedDate) return;
       try {
-        const res = await fetch(`http://10.0.0.1:3333/bookings/unavailableTimes?date=${selectedDate}`);
+        const res = await fetch(`${API_BASE_URL}/bookings/unavailableTimes?date=${selectedDate}`);
         const data = await res.json();
         setBlockedSlots(data.blockedSlots || []);
       } catch (err) {
@@ -46,7 +47,7 @@ export default function BookingPage() {
   const handleConfirmBooking = async () => {
     setLoading(true);
     try {
-        const res = await fetch('http://10.0.0.1:3333/tickets/createTicket', {
+        const res = await fetch(`${API_BASE_URL}/tickets/createTicket`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

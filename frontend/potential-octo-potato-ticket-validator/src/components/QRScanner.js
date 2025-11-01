@@ -4,6 +4,8 @@ import Webcam from "react-webcam";
 import axios from "axios";
 import { Box, Typography, Paper, CircularProgress } from "@mui/material";
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || '/pop/api';
+
 export default function TicketScanner() {
   const webcamRef = useRef(null);
   const codeReader = useRef(null);
@@ -48,7 +50,7 @@ export default function TicketScanner() {
 
             try {
               const res = await axios.get(
-                `http://10.0.0.1:3333/tickets/validate-ticket/${extracted}`
+                `${API_BASE_URL}/tickets/validate-ticket/${extracted}`
               );
               setResponseMessage(res.data.message);
               setFlash("success");

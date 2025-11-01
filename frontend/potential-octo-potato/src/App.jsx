@@ -9,7 +9,7 @@ import BottomNavLayout from './components/BottomNavLayout.jsx';
 
 export default function App() {
   return (
-    <Router>
+    <Router basename="/pop">
       <Routes>
         {/* Pages with bottom navigation */}
         <Route

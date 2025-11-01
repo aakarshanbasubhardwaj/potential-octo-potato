@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Button, CircularProgress, Skeleton } from '@mui/material';
 import MovieCard from './MovieCard';
 import { ArrowForwardIos } from '@mui/icons-material';
+import {API_BASE_URL} from '../config/config.js';
 
 const movieCache = {};
 
@@ -25,7 +26,7 @@ export default function PaginatedList({ title, model, itemType, CardComponent = 
 
     try {
       setLoading(true);
-      const res = await fetch(`http://10.0.0.1:3333/${itemType}/${endpoint}/?page=${page}&model=${model}`);
+      const res = await fetch(`${API_BASE_URL}/${itemType}/${endpoint}/?page=${page}&model=${model}`);
       const data = await res.json();
       movieCache[cacheKey] = data;
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Grid, Button } from '@mui/material';
 import MovieCard from './MovieCard';
+import {API_BASE_URL} from '../config/config.js';
 
 export default function SearchResults({ searchTerm, model, initialResults = [] }) {
   const [results, setResults] = useState(initialResults);
@@ -11,7 +12,7 @@ export default function SearchResults({ searchTerm, model, initialResults = [] }
     setLoading(true);
 
     try {
-      const res = await fetch('http://10.0.0.1:3333/search/multi', {
+      const res = await fetch(`${API_BASE_URL}/search/multi`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ searchTerm, page: page + 1 }),
