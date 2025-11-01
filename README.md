@@ -1,9 +1,11 @@
 creata netwrok - docker network create pop-net
-add mongo db to this network
+add mongo db and nginx to this network
 create a user in pop db 
 give cred in env in compose
 
 look into qr code reading for the validator app
+make it wokr using IP
+
 create .env ansd pop with the content
 server ip or monmgodb container name
 docker compose uri from ongo in backend "mongodb://popuser:popUser@123@10.0.0.1:27017/potential-octo-potato?authSource=potential-octo-potato"
