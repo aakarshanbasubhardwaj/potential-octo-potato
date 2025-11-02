@@ -489,7 +489,9 @@ We welcome contributions! Here’s how to get involved:
 
 ## License
 
-Specify license here (e.g., MIT, Apache 2.0, etc.).
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
+
+Credits for TMDb data: [TMDb](https://www.themoviedb.org/)
 
 ## Contact
 
