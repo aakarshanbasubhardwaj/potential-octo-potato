@@ -1,18 +1,5 @@
-give credit to tmdb
-
+add to home screen does not take the icons
 look into qr code reading for the validator app
-
-# 1. Build the image and name it 'pop:latest'
-docker build -t pop:latest .
-
-# 2. Tag it for Docker Hub
-docker tag pop:latest yourusername/pop:latest
-
-# 3. Log in to Docker Hub
-docker login
-
-# 4. Push the image
-docker push yourusername/pop:latest
 
 # PoP🍿 (potential-octo-potato)
 
@@ -288,6 +275,7 @@ nano docker-compose.yml
     In the backend service -
 
     - Replace the placeholders PoP_DB_USER, PoP_DB_USER_PASSWORD with the user credentials created eralier for the db `potential-octo-potato`
+      > Note- if the password containes special characters (@,#,$ etc.) then they must be url encoded before pasting in the compose file.
 
     - Provide your `TMDB_API_KEY` and `REGION` 
 
@@ -533,3 +521,10 @@ For questions, suggestions, or collaboration:
 ---
 
 > This project aims to bring a professional movie theater experience to your home network — fully open-source, modular, and customizable.
+
+## Credits
+
+This project uses **The Movie Database (TMDb) API** for movie and TV show data.  
+All data and images are © TMDb.  
+
+[Visit TMDb](https://www.themoviedb.org/)

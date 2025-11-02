@@ -6,6 +6,7 @@ import BookingConfirmation from './pages/BookingConfirmation';
 import BookingHistory from './pages/BookingHistory';
 import Tickets from './pages/Tickets';
 import BottomNavLayout from './components/BottomNavLayout.jsx';
+import FooterTMDb from './components/FooterTMDb';
 
 export default function App() {
   return (
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/bookingHistory" element={<BookingHistory />} />
         <Route path="/ticket/:confirmationNumber" element={<Tickets />} />
       </Routes>
+      <FooterTMDb />
     </Router>
   );
 }

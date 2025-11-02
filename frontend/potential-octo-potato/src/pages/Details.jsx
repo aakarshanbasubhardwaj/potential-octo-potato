@@ -159,6 +159,7 @@ export default function MovieDetails() {
           left: 0,
           right: 0,
           p: 2,
+          pb: `calc(2rem + env(safe-area-inset-bottom))`,
           backgroundColor: 'background.paper',
           boxShadow: '0 -4px 20px rgba(0,0,0,0.15)',
           zIndex: 1200,

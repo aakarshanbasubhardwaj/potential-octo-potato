@@ -388,6 +388,7 @@ const formatDate = (d) =>
         left: 0,
         right: 0, 
         p: 2,
+        pb: `calc(2rem + env(safe-area-inset-bottom))`,
         // backgroundColor: "white",
         boxShadow: "0 -2px 10px rgba(0,0,0,0.1)",
         zIndex: 1000,

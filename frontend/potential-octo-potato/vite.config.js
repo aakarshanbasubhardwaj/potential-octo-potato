@@ -19,17 +19,17 @@ export default defineConfig({
         orientation: 'portrait',
         icons: [
           {
-            src: '/public/potential-octo-potato',
+            src: '/public/potential-octo-potato.svg',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/public/potential-octo-potato',
+            src: '/public/potential-octo-potato.svg',
             sizes: '512x512',
             type: 'image/png'
           },
           {
-            src: '/public/potential-octo-potato',
+            src: '/public/potential-octo-potato.svg',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
