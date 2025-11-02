@@ -1,17 +1,6 @@
-creata netwrok - docker network create pop-net
-add mongo db and nginx to this network
-create a user in pop db 
-give cred in env in compose
+give credit to tmdb
 
 look into qr code reading for the validator app
-make it wokr using IP
-
-create .env ansd pop with the content
-server ip or monmgodb container name
-docker compose uri from ongo in backend "mongodb://popuser:popUser@123@10.0.0.1:27017/potential-octo-potato?authSource=potential-octo-potato"
-and env environment:
-  - NODE_ENV=production
-  - MONGO_URI_PROD=mongodb://popuser:app_password_here@10.0.0.1:27017/potential-octo-potato?authSource=potential-octo-potato
 
 # 1. Build the image and name it 'pop:latest'
 docker build -t pop:latest .
@@ -25,543 +14,7 @@ docker login
 # 4. Push the image
 docker push yourusername/pop:latest
 
-# 5. (Optional) Pull elsewhere to verify
-docker pull yourusername/pop:latest
-
-dynamic port mapping for each app 
-
-1️⃣ Frontend API calls (server-ip:3333) → no changes for dev & prod
-
-Right now, your frontend is hardcoding the backend via server-vpn-ip:3333. That breaks portability because:
-
-Local dev uses localhost:3333
-
-Prod should go via Nginx reverse proxy (/api)
-
-Solution: Use relative paths with environment variables.
-
-Step 1: Use REACT_APP_API_URL
-
-In all React apps:
-
-const API_URL = process.env.REACT_APP_API_URL || '/api';
-
-
-Local dev: .env:
-
-REACT_APP_API_URL=http://localhost:3333/api
-
-
-Prod: .env or Docker build arg:
-
-REACT_APP_API_URL=/api
-
-
-Then in fetch calls:
-
-fetch(`${API_URL}/movies`)
-
-
-✅ This way, same code works in dev and production:
-
-Dev → calls backend container or localhost
-
-Prod → Nginx handles /api → backend
-
-No code changes required between environments.
-
-2️⃣ MongoDB container
-
-You already have a MongoDB container running on prod. Two choices:
-
-Option A: Use existing MongoDB database for this app
-
-Use a dedicated database name (not the default test) for this ecosystem.
-
-In your backend .env:
-
-MONGO_URI=mongodb://mongo:27017/pop_ecosystem
-
-
-Backend will only connect and create collections in this DB.
-
-No attempt to start another Mongo container is needed.
-
-Option B: Separate Mongo container (if isolation desired)
-
-Create a new container in Docker Compose:
-
-mongo-pop:
-  image: mongo:latest
-  container_name: mongo-pop
-  volumes:
-    - mongo_pop_data:/data/db
-  networks:
-    - pop-net
-
-
-Use a separate DB name to avoid conflicts: pop_ecosystem
-
-Volumes ensure data persists.
-
-💡 Recommendation: Option A is cleaner if you want to avoid extra containers.
-
-3️⃣ Nginx container for the ecosystem
-
-You want a single Nginx container on the prod server to serve all 3 frontends + backend.
-
-Steps:
-
-Create Dockerfile:
-
-# nginx/Dockerfile
-FROM nginx:alpine
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-
-
-Nginx config (nginx.conf):
-
-server {
-    listen 80;
-
-    # Booking App
-    location /booking/ {
-        proxy_pass http://frontend-booking:80/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-
-    # Validator App
-    location /validator/ {
-        proxy_pass http://frontend-validator:80/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-
-    # Kiosk App
-    location /kiosk/ {
-        proxy_pass http://frontend-kiosk:80/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-
-    # Backend API
-    location /api/ {
-        proxy_pass http://backend:3333/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-
-
-Docker Compose snippet (if you want to integrate):
-
-nginx:
-  build: ./nginx
-  container_name: nginx-proxy
-  ports:
-    - "80:80"
-  depends_on:
-    - backend
-    - frontend-booking
-    - frontend-validator
-    - frontend-kiosk
-  networks:
-    - pop-net
-
-
-If you already have a shared Nginx container in your home lab, you can just add a new config file and reload Nginx.
-
-No third-party packages are needed.
-
-4️⃣ Docker networking
-
-All containers (backend, 3 frontends, Nginx) should be on the same Docker network:
-
-networks:
-  pop-net:
-    driver: bridge
-
-
-This allows Nginx to resolve container names internally (http://frontend-booking:80).
-
-✅ Summary of What You Need to Do
-
-Frontend:
-
-Use relative paths or REACT_APP_API_URL → /api in prod
-
-Local dev still works with localhost:3333
-
-Backend:
-
-Connect to either existing MongoDB DB (pop_ecosystem) or separate container
-
-Frontend Containers:
-
-Build production React apps (npm run build)
-
-Serve via their own containers (Nginx or lightweight server)
-
-Nginx Container:
-
-Single container serving all 3 frontends + reverse proxy to backend
-
-Mount production build folders for each frontend
-
-Docker Compose / Network:
-
-Shared network for backend, frontend containers, Nginx
-
-Expose only Nginx to host (80/443)
-
-I can also write the final production-ready Docker Compose + environment setup for this scenario so that:
-
-You just docker-compose up -d
-
-Frontends call backend automatically
-
-MongoDB uses existing DB
-
-Nginx routes everything correctly
-
-Do you want me to do that?
-
-so in nginnx config i cna give localhost with different ports fo different apps?
-
-ChatGPT said:Yes — that’s exactly how you would do it if your Nginx is running on the host, outside Docker.
-Here’s the logic:
-
-1️⃣ Expose container ports to host
-In your docker-compose.yml for each app:
-frontend-booking:
-  build: ./frontend-booking
-  ports:
-    - "8080:80"      # maps container port 80 → host 8080
-
-frontend-validator:
-  build: ./frontend-validator
-  ports:
-    - "8081:80"
-
-frontend-kiosk:
-  build: ./frontend-kiosk
-  ports:
-    - "8082:80"
-
-backend:
-  build: ./backend
-  ports:
-    - "3333:3333"
-
-
-2️⃣ Nginx config (host)
-You can now use localhost with those ports:
-server {
-    listen 80;
-
-    location /booking/ {
-        proxy_pass http://127.0.0.1:8080/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-
-    location /validator/ {
-        proxy_pass http://127.0.0.1:8081/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-
-    location /kiosk/ {
-        proxy_pass http://127.0.0.1:8082/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-
-    location /api/ {
-        proxy_pass http://127.0.0.1:3333/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
->>>so best way to this right now is to have github actions build the prod build fo rall backend and formtned apps then the docker image cretaion using the docker fil e for all apps by simply copying th ebuild folders in the nginx base reference containers and then pushing the images to docker hub, then mamnually go into prod server to run docker coimpose to which has fetch from the docker hub and run the continers wiht desired ports on the host, and then go ahead an edit the nginx conf?
-Yes — that workflow is completely valid and is basically the classic “build in CI, deploy manually” approach. Let me break it down cleanly and point out potential pitfalls and optimizations:
->>>
-✅ Workflow Overview
-
-
-GitHub Actions CI/CD
-
-
-Pulls full source code.
-
-
-Builds backend image (Node.js/Express).
-
-
-Builds frontend apps into static files (npm run build) and copies them into Nginx-based containers.
-
-
-Tags the images (e.g., pop-backend:latest, pop-booking:latest).
-
-
-Pushes all images to Docker Hub (or another registry).
-
-
-
-
-Production server
-
-
-Pulls the images from Docker Hub.
-
-
-Runs docker-compose up -d with a docker-compose.yml referencing the pulled images.
-
-
-Maps backend and frontend containers to host ports as desired.
-
-
-Edits/updates Nginx config for reverse proxy routing /api/ to backend and /booking, /validator, /kiosk to corresponding frontend container ports.
-
-
-
-
-
-⚡ Pros
-
-
-Simple, uses standard Docker and Docker Compose.
-
-
-No need for self-hosted runners or local build on prod.
-
-
-Keeps prod server clean — no source code, only images.
-
-
-Easy rollback: pull older images from Docker Hub.
-
-
-
-⚡ Cons / Gotchas
-
-
-Manual Nginx edit
-
-
-Each time ports change or you add new frontend, you need to update Nginx config and reload.
-
-
-Can be automated via templates + CI/CD if desired.
-
-
-
-
-Docker Hub dependency
-
-
-Requires prod server to have internet access to Docker Hub.
-
-
-If your VPN is isolated with no internet, this breaks.
-
-
-
-
-Port changes
-
-
-If backend host port changes, you need to update Nginx proxy to match — frontend doesn’t need changes, though.
-
-
-
-
-
-⚡ Optimizations
-
-
-Use environment variable templating in docker-compose.yml to control ports dynamically.
-
-
-Preconfigure Nginx to route based on container names rather than hardcoded host ports:
-
-
-location /api/ {
-    proxy_pass http://backend:3333/;
-}
-
-
-
-Then all frontend apps just use /api/ and don’t care about host port.
-
-
-If you do this, your Nginx config becomes portable and largely static, and all host port mapping is handled by Docker.
-
-
-
-✅ Bottom line
-Yes, your plan works and is fully functional for your home lab:
-
-
-GitHub Actions builds → Docker Hub → Prod pulls → Docker Compose → Nginx proxy.
-
-
-Optional: you can further automate Nginx edits or make it containerized so Nginx config is version-controlled too.
-
-
-
-If you want, I can draft a production-ready Docker Compose + Nginx setup for your 1 backend + 3 frontend apps that:
-
-
-Uses container names for proxying
-
-
-Maps host ports dynamically
-
-
-Eliminates most manual Nginx edits
-
-
-Works with Docker Hub images
-
-
-Do you want me to do that?
-
-Perfect. Here's a production-ready setup for your home lab ecosystem — 1 backend + 3 frontend apps, using Docker Compose and a single Nginx container for reverse proxying. This eliminates most manual Nginx edits and uses container names for internal routing.
-
-# docker-compose.prod.yml
-version: "3.9"
-
-services:
-  backend:
-    image: yourdockerhubusername/pop-backend:latest
-    container_name: pop-backend
-    restart: always
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/pop_db
-      - NODE_ENV=production
-    networks:
-      - pop-network
-
-  booking-app:
-    image: yourdockerhubusername/pop-booking:latest
-    container_name: pop-booking
-    restart: always
-    networks:
-      - pop-network
-
-  validator-app:
-    image: yourdockerhubusername/pop-validator:latest
-    container_name: pop-validator
-    restart: always
-    networks:
-      - pop-network
-
-  kiosk-app:
-    image: yourdockerhubusername/pop-kiosk:latest
-    container_name: pop-kiosk
-    restart: always
-    networks:
-      - pop-network
-
-  nginx:
-    image: nginx:alpine
-    container_name: pop-nginx
-    restart: always
-    ports:
-      - "80:80"       # frontend apps
-      - "443:443"     # https if needed
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - backend
-      - booking-app
-      - validator-app
-      - kiosk-app
-    networks:
-      - pop-network
-
-networks:
-  pop-network:
-    driver: bridge
-
-Example nginx.conf
-worker_processes 1;
-
-events { worker_connections 1024; }
-
-http {
-    server {
-        listen 80;
-
-        # Backend API
-        location /api/ {
-            proxy_pass http://backend:3333/;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-        }
-
-        # Booking frontend
-        location /booking/ {
-            proxy_pass http://booking-app:80/;
-            proxy_set_header Host $host;
-        }
-
-        # Validator frontend
-        location /validator/ {
-            proxy_pass http://validator-app:80/;
-            proxy_set_header Host $host;
-        }
-
-        # Kiosk frontend
-        location /kiosk/ {
-            proxy_pass http://kiosk-app:80/;
-            proxy_set_header Host $host;
-        }
-    }
-}
-
-✅ Key Features
-
-Single Nginx container routes all frontends and backend API.
-
-Uses container names inside Docker network (pop-network) for proxying — no need to edit Nginx for host port changes.
-
-Docker Compose handles port mapping for public access (80/443).
-
-Backend connects to MongoDB container or existing MongoDB instance via network name.
-
-Static frontend files are already inside the Docker images (built via GitHub Actions).
-
-Deployment Steps
-
-On prod server:
-
-mkdir pop-ecosystem && cd pop-ecosystem
-# place docker-compose.prod.yml + nginx.conf here
-docker-compose pull       # pull latest images from Docker Hub
-docker-compose up -d      # start all containers
-
-
-Access apps:
-
-http://server-ip/booking/ → Booking app
-
-http://server-ip/validator/ → Validator app
-
-http://server-ip/kiosk/ → Kiosk app
-
-http://server-ip/api/ → Backend API
-
-This setup means no source code is required on prod, Nginx config is mostly static, and port changes on backend/frontend images don’t require edits.
-
-If you want, I can also show how to adjust the Dockerfiles for the frontend apps so they build into the Nginx image properly, ready for this setup.
-
-Do you want me to do that next?
-# 🎬 POP (potential-octo-potato)
+# PoP🍿 (potential-octo-potato)
 
 # 📑 Table of Contents
 
@@ -573,19 +26,15 @@ Do you want me to do that next?
    * [Ticket Validator App](#3-ticket-validator-app)
    * [Show Schedule Kiosk](#4-show-schedule-kiosk)
 3. [Features](#features)
-4. [Architecture](#architecture)
 5. [Setup Instructions](#setup-instructions)
-
    * [Prerequisites](#1-prerequisites)
    * [Configuration](#2-configuration)
 6. [Deployment](#deployment)
-
    * [Example docker-compose.yml](#example-docker-composeyml-structure)
 7. [Physical Setup Instructions](#physical-setup-instructions)
 8. [Running](#running)
 9. [Development Setup](#development-setup)
 10. [Contributing](#contributing)
-
     * [Contribution Ideas](#contribution-ideas)
 11. [License](#license)
 12. [Contact](#contact)
@@ -594,206 +43,447 @@ Do you want me to do that next?
 
 ## Overview
 
-The **POP (potential-octo-potato)** is a complete home-theater software suite designed for private setups. It includes multiple interconnected applications that handle show scheduling, ticket booking, validation, and live display of screenings. The system can be self-hosted on a homelab and accessed securely through a home VPN.
-
----
+The **PoP (potential-octo-potato)** is a home-theater software designed for homelab setups. It includes multiple interconnected applications that handle show scheduling, ticket booking and validation, and live display of screenings. The system can be self-hosted on a homelab and accessed securely through a home VPN.
 
 ## System Components
 
-### 1. Backend API (Node.js + MongoDB)
+### 1. PoP Backend (Node.js + MongoDB)
 
-* Core service that manages data.
+* Backend service that manages data.
 * Handles:
     
-  * Fetches movie and show data from TMDB on startup
-  * Provides server-side pagination for efficient data delivery
+  * Popular, Top Rated and Trending Movies and Tv Shows data from TMDB on startup
+  * Provides server-sided pagination for efficient data delivery
   * Show bookings and schedules
   * Ticket generation & validation
 
-### 2. Booking App
+### 2. PoP🍿 Ticket Booking App
 
 * Built as a React Single Page Application (SPA) and Progressive Web App (PWA) with a mobile-first design.
-* Allows for browsing movies and booking tickets.
+* Allows for browsing movies / tv shows and booking tickets.
 * Generates digital tickets.
+* Displays where to stream the selected title from.
 
-### 3. Ticket Validator App
+### 3. PoP Ticket Validator App
 
 * Interface for validating booked tickets via QR code.
 * Makes use of the backend API for verification.
 
-### 4. Show Schedule Kiosk
+### 4. PoP Show Schedule Kiosk App
 
 * Display app showing **Now Showing** and **Next Up** movies.
 * Automatically refreshes based on backend schedule data.
 
----
-
 ## Features
 
-* Modular architecture (each app runs independently)
+* Automatic data refresh from TMDB once every 24 hours.
 * REST API-based communication
 * Dockerized for consistent deployment
-<!-- * Works fully offline over local network or VPN -->
-* Server-side pagination
+* Server-sided pagination
 * Automatic TMDB data fetching and caching
 * Search for any Movie or TV Show
-* Extendable with admin panel, notifications, and automation
-
----
-
-## Architecture
-
-```
-[Booking App (React PWA)]   ┐
-                            │
-[Ticket Validator]          ├──>  [Backend API (Node.js)]  <──> [MongoDB (Docker)]
-                            │
-[Schedule Kiosk]            ┘
-```
 
 Optional future extensions:
 
-* [Admin Dashboard]
-* [Notification Service]
-* [Media Automation Layer]
-
----
+* Admin Dashboard
+* Notification Service
+* Media Automation Layer
 
 ## Setup Instructions
 
 ### 1. Prerequisites
 
 * Docker and Docker Compose installed.
-* MongoDB must run as a **Docker container**.
-* A valid **TMDB account**, **API key**, and **access token**.
+* A valid **TMDB account**, **API key**, and **access token**. Follow this [link](https://developer.themoviedb.org/docs/getting-started) to create an account and generate the tokens as per the instructions given on the page.
+* Know the **ISO-3166-1** code of the country you live in or want to watch media of (Simple google search reveals this, e.g. - ISO-3166-1 country code for India).
 
-### 2. Configuration
+## Deployment Guide
 
-Create a `config.js` file inside the backend directory:
+Each PoP service is containerized and can be deployed using **Docker Compose**. Follow these steps to ensure a proper setup.
 
-```js
-export default {
-    "TMDB_API_KEY" : "<your-TMDB-API-key>",
-    "TMDB_BASE_URL" : "https://api.themoviedb.org/3",
-    "REGION" : "<ISO-3166-1 code of the country you live in or want to watch media of>"
+### 1. Create a Docker Network
+
+Create a dedicated network for all PoP services:
+
+```bash
+docker network create pop-net
+```
+
+### 2. MongoDB Setup
+
+Create a MongoDB container with persistent storage using the following Docker Compose configuration:
+
+1. Create a directory for MongoDB:
+
+```bash
+mkdir mongodb
+cd mongodb
+```
+
+2. Create a docker compose file in this directory
+
+```bash
+nano docker-compose.yml
+```
+Replace the `</path/to/data/storage>` with your desired path and paste the following contnent in the compose file then save and exit using `Ctrl+O`>`Enter`>`Ctrl+X`
+
+```yaml
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - </path/to/data/storage>:/data/db  # e.g., /hdd/prod/mongo/data
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: <strongpassword>
+    networks:
+      - pop-net
+
+networks:
+  pop-net:
+    external: true
+```
+
+If a MongoDB container already exists, attach it to the `pop-net` network.
+
+```bash
+docker network connect pop-net <existing_mongo_container_name>
+```
+
+After the container is running, create a new database `potential-octo-potato` and add a user with your preferred credentials.
+
+- Connect to the running MongoDB container
+```bash
+docker exec -it <existing_mongo_container_name> mongosh -u root -p <strongpassword> --authenticationDatabase admin
+```
+
+- Create a new database
+```bash
+use potential-octo-potato
+```
+
+- Create a new user with password and roles
+```bash
+db.createUser({
+  user: "<your_db_user>",
+  pwd: "<your_db_password>",
+  roles: [{ role: "readWrite", db: "potential-octo-potato" }]
+})
+```
+
+- Verify the user creation
+```bash
+show users
+```
+
+- Exit the Mongo shell
+```bash
+exit
+```
+
+### 3. Nginx Setup
+
+1. Create a directory for Nginx configuration:
+
+```bash
+mkdir nginx
+cd nginx
+```
+
+2. Inside this directory, create `nginx.conf` with the following content then save and exit using `Ctrl+O`>`Enter`>`Ctrl+X`:
+
+```bash
+nano nginx.conf
+```
+
+```nginx
+server {
+    listen 80;
+
+    server_name _;
+
+    # PoP Frontend
+    location /pop/ {
+        proxy_pass http://popfrontend:4173/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # PoP Backend API
+    location /pop/api/ {
+        proxy_pass http://popbackend:3333/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # PoP Show Schedule
+    location /pop-show-schedule/ {
+        proxy_pass http://pop-show-schedule:4174/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # PoP Ticket Validator
+    location /pop-ticket-validator/ {
+        proxy_pass http://pop-ticket-validator:4174/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
 }
 ```
 
-On server startup, the backend will automatically fetch data from TMDB once and populate MongoDB with the popular, top rated and trending movie and TV show listings. The MongoDB Data is refreshed every 24 hours.
+3. Create an Nginx container using the following compose file in the same directory as `nginx.conf`:
 
----
+    - Create a `docker-compose.yml` file:
 
-## Deployment
+      ```bash
+      nano docker-compose.yml
+      ```
 
-Each service is containerized and can be deployed via **Docker Compose**.
+    - Paste the following configuration into `docker-compose.yml` then save and exit using `Ctrl+O`>`Enter`>`Ctrl+X`:
 
-### Example `docker-compose.yml` structure
+      ```yaml
+      version: "3.9"
+
+      services:
+        nginx:
+          image: nginx:alpine
+          container_name: nginx
+          restart: unless-stopped
+          ports:
+            - "80:80"
+          volumes:
+            - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+          networks:
+            - pop-net
+
+      networks:
+        pop-net:
+          external: true
+      ```
+
+    If an Nginx container already exists, attach it to the `pop-net` network.
+    ```bash
+    docker network connect pop-net <existing_nginx_container_name>
+    ```
+
+### 4. PoP Services Deployment
+
+1. Create a deployment directory and `docker-compose.yml` file:
+
+```bash
+mkdir pop
+cd pop
+nano docker-compose.yml
+```
+
+2. Paste the following configuration into `docker-compose.yml` then save and exit using `Ctrl+O`>`Enter`>`Ctrl+X`:
+
+    In the backend service -
+
+    - Replace the placeholders PoP_DB_USER, PoP_DB_USER_PASSWORD with the user credentials created eralier for the db `potential-octo-potato`
+
+    - Provide your `TMDB_API_KEY` and `REGION` 
 
 ```yaml
-version: '3.8'
+version: "3.9"
+
 services:
   backend:
-    build: ./backend
-    ports:
-      - "3333:3333"
-    env_file:
-      - .env
-    depends_on:
-      - mongo
+    image: aakarshanbasubhardwaj/popbackend:latest
+    container_name: popbackend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI_PROD=mongodb://{PoP_DB_USER}:{PoP_DB_USER_PASSWORD}@mongo:27017/potential-octo-potato?authSource=potential-octo-potato
+      - TMDB_API_KEY=<your_TMDB_API_KEY_here>
+      - REGION=<ISO-3166-1_country_code>
+      - PORT=<desired_PORT>
+    networks: 
+      - pop-net
 
-  booking-app:
-    build: ./booking-app
-    ports:
-      - "8080:80"
-    depends_on:
-      - backend
+  frontend:
+    image: aakarshanbasubhardwaj/popfrontend:latest
+    container_name: popfrontend
+    restart: unless-stopped
+    networks: 
+      - pop-net
 
-  validator-app:
-    build: ./validator-app
-    ports:
-      - "8081:80"
-    depends_on:
-      - backend
+  pop-show-schedule:
+    image: aakarshanbasubhardwaj/pop-show-schedule:latest
+    container_name: pop-show-schedule
+    restart: unless-stopped
+    networks:
+      - pop-net
 
-  kiosk-app:
-    build: ./kiosk-app
-    ports:
-      - "8082:80"
-    depends_on:
-      - backend
+  pop-ticket-validator:
+    image: aakarshanbasubhardwaj/pop-ticket-validator:latest
+    container_name: pop-ticket-validator
+    restart: unless-stopped
+    networks:
+      - pop-net
 
-  mongo:
-    image: mongo:latest
-    volumes:
-      - mongo_data:/data/db
-
-volumes:
-  mongo_data:
+networks:
+  pop-net:
+    external: true
 ```
+
+3. Deploy all PoP services:
+
+```bash
+docker-compose up -d
+```
+
+Verify deployment by trying to access all apps using - 
+
+* **PoP🍿 Ticket Booking App::** `http://<server-ip>/pop`
+* **PoP Show Schedule Kiosk App:** `http://<server-ip>/pop-show-schedule/`
+* **PoP Ticket Validator App:** `http://<server-ip>/pop-ticket-validator/`
+* **PoP Backend:** `http://<server-ip>/pop/api/test`
+
+For example if your server's VPN IP is 10.0.0.1 then access the PoP🍿 Ticket Booking App at ```http://10.0.0.1/pop/```
+
+If deployment was successful then **PoP Backend:** - displays `{"message":"Test Successful"}` and all other apps load and display thier content.
+
 ## Physical Setup Instructions
 
-To provide a cinema-like experience in your home theater, you can set up your ecosystem components on dedicated devices:
+To provide a cinema-like experience in your home theater, you can set up PoP services on dedicated devices:
 
-* **Show Schedule Kiosk:**
+* **PoP Show Schedule Kiosk App:**
 
-  * Use a dedicated screen (e.g., old laptop or tablet) mounted on a wall just outside the home theater.
-  * Run the **Show Schedule Kiosk app** in full-screen mode to display **Now Showing** and **Next Up** movies.
+  * Use a dedicated screen (e.g., old laptop or tablet) mounted on a wall just outside the home theater room.
+  * Run the **PoP Show Schedule Kiosk App** in full-screen mode in a browser to display **Now Showing** and **Next Up** movies.
 
-* **Ticket Validator:**
+* **PoP Ticket Validator App:**
 
   * Can run on another device with a front facing camera such as an old phone or tablet.
-  * Ideally mounted below or near the show schedule kiosk for easy access.
+  * Ideally mounted below or near the PoP Show Schedule Kiosk App for easy access.
 
-* **Booking App:**
+  Alternatively use another handheld device to run the PoP Ticket Validator App.( This will require manual handling of the validation process hence not a preferred way)
 
-  * Accessible from any mobile device, allowing users to browse and book tickets.
+* **PoP🍿 Ticket Booking App:**
+
+  * Accessible from any mobile device in a browser, allowing users to browse and book tickets.
 
 * **Backend & Frontend Hosting:**
 
   * All frontend apps and the backend must be **self-hosted on the home lab server** (see Deployment section) for proper functionality of the ecosystem.
 
----
-
-### Running
-
-```bash
-docker-compose up -d --build
-```
-
-Access each app via:
-
-* **Booking App:** `http://<server-ip>:8080`
-* **Ticket Validator:** `http://<server-ip>:8081`
-* **Kiosk Display:** `http://<server-ip>:8082`
-* **Backend:** `http://<server-ip>:3333`
----
-
-## Development Setup
+## Local Development Setup
 
 1. Clone the repository:
 
    ```bash
    git clone git@github.com:aakarshanbasubhardwaj/potential-octo-potato.git
-   cd movie-ecosystem
+   cd potential-octo-potato
    ```
+
+2. If not running already, create and run a MongoDB container using the followign compose - 
+
+    ```yml
+    version: "3.9"
+
+    services:
+      mongo:
+        image: mongo:latest
+        container_name: mongo-dev
+        ports:
+          - "27018:27017"
+        volumes:
+          - </path/to/desired/data/storage>:/data/db
+    ```
 
 2. Set up environment variables:
+    - In the `backend` folder -
+      ```bash
+      cd backend
+      touch .env
+      ```
 
-   ```bash
-   cp .env.example .env
-   ```
+      In the .env file provide the MONGO_URI_DEV, TMDB_API_KEY, REGION and PORT
 
-   Fill in your MongoDB URI, TMDB API key, and access token.
+      ```text
+      MONGO_URI_DEV=mongodb://localhost:<27018>/potential-octo-potato
+      TMDB_API_KEY=<your_TMDB_API_KEY_here>
+      REGION=<ISO-3166-1_country_code>
+      PORT=<desired_port>
+      ```
+    - In the `frontend/potential-octo-potato` folder -
+
+      ```bash
+      cd ../frontend/potential-octo-potato
+      touch .env
+      ```
+
+      In the .env file provide the VITE_API_URL
+
+      ```text
+      VITE_API_URL=http://localhost:<same_port_number_as_specified_in_backend>
+      ```    
+
+    - In the `frontend/potential-octo-potato-show-schedule` folder -
+
+      ```bash
+      cd ../potential-octo-potato-show-schedule
+      touch .env
+      ```
+
+      In the .env file provide the REACT_APP_API_URL
+
+      ```text
+      REACT_APP_API_URL=http://localhost:<same_port_number_as_specified_in_backend>
+      ```  
+
+    - In the `frontend/potential-octo-potato-ticket-validator` folder -
+
+      ```bash
+      cd ../potential-octo-potato-ticket-validator
+      touch .env
+      ```
+
+      In the .env file provide the REACT_APP_API_URL
+
+      ```text
+      REACT_APP_API_URL=http://localhost:<same_port_number_as_specified_in_backend>
+      ```  
 
 3. Run services locally:
 
-   ```bash
-   docker-compose up
-   ```
+    - In the `backend` folder -
 
-4. Access apps at their respective local ports.
+      ```bash
+      npm i
+      npm run server
+      ```
 
----
+    - In the `frontend/potential-octo-potato` folder -
+
+      ```bash
+      npm i
+      npm run dev
+      ``` 
+
+    - In the `frontend/potential-octo-potato-show-schedule` folder -
+
+      ```bash
+      npm i
+      npm run start
+      ``` 
+
+    - In the `frontend/potential-octo-potato-ticket-validator` folder -
+
+      ```bash
+      npm i
+      npm run start
+      ```
+
+4. Access apps at their respective local ports as displayed in the console.
 
 ## Contributing
 

@@ -8,10 +8,13 @@ import search from './routes/search/index.js';
 import checkModelsAndLoadData from './services/index.js';
 import nextShow from './routes/nextShow/index.js';
 import bookings from './routes/booking/index.js'
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 app.use(cors())
-const PORT = 3333;
+const PORT = process.env.PORT;
 
 app.use(express.json());
 

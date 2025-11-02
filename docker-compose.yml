@@ -8,6 +8,9 @@ services:
     environment:
       - NODE_ENV=production
       - MONGO_URI_PROD=mongodb://{DB_USER}:{DB_USER_PASSWORD}@mongo:27017/potential-octo-potato?authSource=potential-octo-potato
+      - TMDB_API_KEY=<your_TMDB_API_KEY_here>
+      - REGION=<ISO-3166-1_country_code>
+      - PORT=<desired_PORT>
     networks: 
       - pop-net
   frontend:
