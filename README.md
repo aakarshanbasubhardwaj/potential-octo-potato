@@ -23,7 +23,7 @@
 
 ## Overview
 
-The **PoP (potential-octo-potato)** is a home-theater software designed for homelab setups. It includes multiple interconnected applications that handle show scheduling, ticket booking and validation, and live display of screenings. The system can be self-hosted on a homelab and accessed securely through a home VPN.
+The **PoP (potential-octo-potato)** is a home-theater software designed for home lab setups. It includes multiple interconnected applications that handle show scheduling, ticket booking and validation, and live display of screenings. The system can be self-hosted on a homelab and accessed securely through a home VPN.
 
 ## System Components
 
