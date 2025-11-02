@@ -1,31 +1,24 @@
-add to home screen does not take the icons
-look into qr code reading for the validator app
-
 # PoP🍿 (potential-octo-potato)
 
 # 📑 Table of Contents
 
 1. [Overview](#overview)
 2. [System Components](#system-components)
-
-   * [Backend API (Node.js + MongoDB)](#1-backend-api-nodejs--mongodb)
-   * [Booking App](#2-booking-app)
-   * [Ticket Validator App](#3-ticket-validator-app)
-   * [Show Schedule Kiosk](#4-show-schedule-kiosk)
+   - [PoP Backend API (Node.js + MongoDB)](#1-pop-backend-nodejs--mongodb)
+   - [PoP Ticket Booking App](#2-pop-ticket-booking-app)
+   - [PoP Ticket Validator App](#3-pop-ticket-validator-app)
+   - [PoP Show Schedule Kisok App](#4-pop-show-schedule-kiosk-app)
 3. [Features](#features)
-5. [Setup Instructions](#setup-instructions)
-   * [Prerequisites](#1-prerequisites)
-   * [Configuration](#2-configuration)
-6. [Deployment](#deployment)
-   * [Example docker-compose.yml](#example-docker-composeyml-structure)
-7. [Physical Setup Instructions](#physical-setup-instructions)
-8. [Running](#running)
-9. [Development Setup](#development-setup)
-10. [Contributing](#contributing)
-    * [Contribution Ideas](#contribution-ideas)
-11. [License](#license)
-12. [Contact](#contact)
-13. [Future Enhancements](#future-enhancements)
+4. [Setup Instructions](#setup-instructions)
+   - [Prerequisites](#1-prerequisites)
+   - [Deployment Guide](#deployment-guide)
+5. [Physical Setup Instructions](#physical-setup-instructions)
+6. [Local Development Setup](#local-development-setup)
+7. [Contributing](#contributing)
+8. [License](#license)
+9. [Contact](#contact)
+10. [Future Enhancements](#future-enhancements)
+11. [Credits](#credits)
 
 
 ## Overview
@@ -44,7 +37,7 @@ The **PoP (potential-octo-potato)** is a home-theater software designed for home
   * Show bookings and schedules
   * Ticket generation & validation
 
-### 2. PoP🍿 Ticket Booking App
+### 2. PoP Ticket Booking App
 
 * Built as a React Single Page Application (SPA) and Progressive Web App (PWA) with a mobile-first design.
 * Allows for browsing movies / tv shows and booking tickets.
@@ -494,13 +487,9 @@ We welcome contributions! Here’s how to get involved:
 * Add automated notifications (email, push)
 * Integrate with home automation (media playback triggers)
 
----
-
 ## License
 
 Specify license here (e.g., MIT, Apache 2.0, etc.).
-
----
 
 ## Contact
 
@@ -509,18 +498,12 @@ For questions, suggestions, or collaboration:
 * **Email:** [aakarshanbasubhardwaj@gmail.com](mailto:aakarshanbasubhardwaj@gmail.com)
 <!-- * **GitHub:** [your-username](https://github.com/your-username) -->
 
----
-
 ## Future Enhancements
 
 * WebSocket live updates between apps
 * Admin analytics dashboard
 * Smart-home integration for lighting and media control
 * Automatic trailer and poster fetching from TMDB API
-
----
-
-> This project aims to bring a professional movie theater experience to your home network — fully open-source, modular, and customizable.
 
 ## Credits
 
