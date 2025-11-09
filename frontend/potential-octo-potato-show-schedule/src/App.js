@@ -15,6 +15,8 @@ export default function App() {
   const [data, setData] = useState(null);
   const [showType, setShowType] = useState("current");
   const [error, setError] = useState(null);
+  const [now, setNow] = useState(new Date());
+
 
   const preloadImages = (shows) => {
     const imageBase = "https://image.tmdb.org/t/p/original";
@@ -69,12 +71,21 @@ export default function App() {
 
   useEffect(() => {
     
-    const cached = localStorage.getItem("cachedSchedule");
-    if (cached) setData(JSON.parse(cached));
+    // const cached = localStorage.getItem("cachedSchedule");
+    // if (cached) setData(JSON.parse(cached));
 
     fetchSchedule(); 
     scheduleNextFetch(); 
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(new Date()); 
+    }, 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
 
   useEffect(() => {
     if (!data?.currentShow || !data?.nextShow) return;
@@ -83,6 +94,22 @@ export default function App() {
     }, 20000);
     return () => clearInterval(interval);
   }, [data]);
+
+  useEffect(() => {
+    if (!data?.nextShow) return;
+
+    const nowTime = now.getTime();
+    const nextStart = new Date(`${data.nextShow.date}T${data.nextShow.time}`).getTime();
+
+    if (!data.currentShow && nowTime >= nextStart) {
+      setData((prev) => ({
+        ...prev,
+        currentShow: prev.nextShow,
+        nextShow: null,
+      }));
+    }
+  }, [now, data?.nextShow]);
+
 
   const renderShowCard = (show, label) => {
     const imageBase = "https://image.tmdb.org/t/p/original";
@@ -193,6 +220,13 @@ export default function App() {
                 start.setHours(h, m, 0, 0);
 
                 const end = new Date(start.getTime() + show.runtime * 60000);
+                const minutes = end.getMinutes();
+                if (minutes > 0 && minutes <= 30) {
+                  end.setMinutes(30, 0, 0);
+                } else if (minutes > 30) {
+                  end.setHours(end.getHours() + 1);
+                  end.setMinutes(0, 0, 0);
+                }
 
                 const formatTime = (d) =>
                   `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
