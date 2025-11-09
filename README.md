@@ -339,7 +339,10 @@ To provide a cinema-like experience in your home theater, you can set up PoP ser
 * **PoP Show Schedule Kiosk App:**
 
   * Use a dedicated screen (e.g., old laptop or tablet) mounted on a wall just outside the home theater room.
-  * Run the **PoP Show Schedule Kiosk App** in full-screen mode by adding the app to home screen / installing it as an app from a browser(if using android tablet it is recommended to use DuckDuckGo, Edge works fine with PCs) to display **Now Showing** and **Next Up** movies.
+  * Run the **PoP Show Schedule Kiosk App** in full-screen mode from a browser to display **Now Showing** and **Next Up** movies.
+    >  If using android tablet it is recommended to use DuckDuckGo, Edge works fine with PCs, Chrome or Brave can also be used, for ios use Safari.
+    
+    > Note: If the app does not open in full screen mode then try clicking or tapping anywhere on the screen and it will open in full screen mode.
 
 * **PoP Ticket Validator App:**
 
