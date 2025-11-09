@@ -110,6 +110,31 @@ export default function App() {
     }
   }, [now, data?.nextShow]);
 
+  const toggleFullscreen = () => {
+    if (
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.msFullscreenElement
+    ) {
+      // Exit fullscreen
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if (document.msExitFullscreen) document.msExitFullscreen();
+    } else {
+      // Enter fullscreen
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) elem.requestFullscreen();
+      else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+    }
+  };
+
+  useEffect(() => {
+    const handleClick = () => toggleFullscreen();
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, []);
+
 
   const renderShowCard = (show, label) => {
     const imageBase = "https://image.tmdb.org/t/p/original";
