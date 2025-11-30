@@ -15,3 +15,6 @@ GET http://10.0.0.1:3333/tickets/validate-ticket/F70BFBF8
 
 ###
 GET http://10.0.0.1:3333/nextShow/showSchedule
+
+###
+GET http://10.0.0.1:3333/trailers/getTrailers

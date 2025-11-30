@@ -8,6 +8,7 @@ import search from './routes/search/index.js';
 import checkModelsAndLoadData from './services/index.js';
 import nextShow from './routes/nextShow/index.js';
 import bookings from './routes/booking/index.js'
+import trailers from './routes/trailers/index.js'
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.use("/tv", tv);
 app.use("/search", search);
 app.use("/nextShow", nextShow);
 app.use("/bookings", bookings);
+app.use("/trailers", trailers);
 
 await conn.connectToDatabase();
 
