@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>PoP🍿Player</title>
+  <style>
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #121212;
+    color: #eee;
+    overflow-x: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+h1 {
+    margin-bottom: 30px;
+    color: #FE7729;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    font-weight: 600;
+}
+
+#controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+#displayCard {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+    overflow: visible; 
+    width: 100%;
+}
+
+#displayCard strong {
+    font-size: 1.2em;
+    color: #FE7729;
+}
+
+#displays {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 15px;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: visible;
+    width: 100%;
+    padding-bottom: 10px;
+}
+
+#displays::-webkit-scrollbar {
+    height: 8px;
+}
+
+#displays::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+.display-card {
+    background: linear-gradient(145deg, #1c1c1c, #242424);
+    border-radius: 12px;
+    border: 2px solid #333;
+    padding: 20px;
+    min-width: 180px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    text-align: center;
+    overflow: visible;
+}
+
+.display-card:hover {
+    box-shadow: 0 6px 12px rgba(254, 119, 41, 0.5);
+    background: linear-gradient(145deg, #2a2a2a, #1e1e1e);
+    border-color: #FE7729;
+    box-shadow: 0 6px 12px rgba(254, 119, 41, 0.5);
+}
+
+.display-card.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+#audioCard {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+#audioCard strong {
+    font-size: 1.2em;
+    color: #FE7729;
+}
+
+#audioControls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+}
+
+#audioControls select,
+#audioControls button {
+    padding: 8px 16px 8px 16px;
+    border-radius: 6px;
+    border: none;
+    background-color: #1f1f1f;
+    color: #eee;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    flex-shrink: 0;
+}
+
+#audioControls select:hover,
+#audioControls button:hover {
+    background-color: #333;
+}
+
+#audioControls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#showContainer > div {
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#sendShowRow {
+  margin-top: 10px;
+}
+
+#fetchShowRow,
+#closeFullscreenRow {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+}
+
+#fetchShowRow button {
+  background: none;
+  border: none;
+  color: #FE7729;
+  font-size: 0.75em;
+  cursor: pointer;
+  padding: 5px 0;
+}
+
+
+#fetchShowRow button:hover:not(:disabled) {
+  text-decoration: none;
+}
+
+.text-button {
+  background: none;
+  border: none;
+  color: #FE7729;
+  font-size: 0.75em;
+  cursor: pointer;
+  padding: 5px 0;
+}
+
+.text-button:disabled {
+  color: #888;
+  cursor: not-allowed;
+  font-size: 0.75em;
+
+}
+
+.text-button:hover:not(:disabled) {
+  text-decoration: none;
+}
+
+.trailer-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #1c1c1c;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.trailer-card:hover {
+  background: #2a2a2a;
+  border-color: #FE7729;
+}
+
+.trailer-card img {
+  width: 80px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.trailer-card label {
+  flex: 1;
+  color: #eee;
+  font-size: 0.85em;
+}
+
+.trailer-card input[type="checkbox"] {
+  accent-color: #FE7729;
+  cursor: pointer;
+}
+
+#serviceCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+#serviceCard strong {
+  font-size: 1.2em;
+  color: #FE7729;
+}
+
+#serviceControls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
+
+#serviceControls input,
+#serviceControls button {
+  padding: 8px 16px 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background-color: #1f1f1f;
+  color: #eee;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+
+#serviceControls input::placeholder {
+  color: #aaa;
+}
+
+#serviceControls input:hover,
+#serviceControls button:hover {
+  background-color: #333;
+}
+
+#serviceControls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#serviceSelectCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+#serviceSelectCard strong {
+  font-size: 1.2em;
+  color: #FE7729;
+}
+
+#serviceSelectControls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
+
+#serviceSelectControls select {
+  padding: 8px 16px 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background-color: #1f1f1f;
+  color: #eee;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+
+#serviceSelectControls select:hover {
+  background-color: #333;
+}
+
+#serviceContainer select,
+#serviceContainer button {
+    padding: 8px 16px 8px 16px;
+    border-radius: 6px;
+    border: none;
+    background-color: #1f1f1f;
+    color: #eee;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    flex-shrink: 0;
+}
+
+#serviceContainer select:hover,
+#serviceContainer button:hover {
+    background-color: #333;
+}
+
+#serviceSelectControls input {
+    padding: 8px 16px 8px 16px;
+    border-radius: 6px;
+    border: none;
+    background-color: #1f1f1f;
+    color: #eee;
+    cursor: text;
+    transition: background 0.2s, transform 0.2s;
+    width: 100%;
+    max-width: 250px;
+    flex: none;
+}
+
+#serviceSelectControls input:hover {
+    background-color: #333;
+}
+
+#serviceSelectControls input::placeholder {
+    color: #aaa;
+}
+
+#serviceContainer button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#urlCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%
+}
+
+#urlCard strong {
+  font-size: 1.2em;
+  color: #FE7729;
+}
+
+#urlCard input {
+  padding: 8px 16px 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background-color: #1f1f1f;
+  color: #eee;
+  cursor: text;
+  transition: background 0.2s, transform 0.2s;
+  width: 100%;
+  max-width: 250px;
+  flex: none;
+}
+
+#urlCard input:hover {
+  background-color: #333;
+}
+
+#urlCard input::placeholder {
+  color: #aaa;
+}
+
+#saveBackendUrlBtn {
+  background: none;
+  border: none;
+  color: #FE7729;
+  font-size: 0.75em;
+  cursor: pointer;
+  padding: 5px 0;
+}
+  </style>
+</head>
+<body>
+
+  
+
+  <div id="controls">
+    <div id="displayCard">
+      <strong>Select a Display</strong>
+      <div id="displays">Loading displays...</div>
+    </div>
+    <div id="closeFullscreenRow">
+      <button id="closeFullscreenBtn" class="text-button">Close Fullscreen</button>
+    </div>
+    <div id="audioCard">
+      <strong>Background Music</strong>
+      <div id="audioControls" style="margin-top:10px;">
+        <select id="speakerSelect"></select>
+        <button id="startAudioBtn">Play</button>
+        <button id="stopAudioBtn">Pause</button>
+      </div>
+    </div>
+
+
+    <div id="urlCard">
+      <strong>Enter PoP Backend URL</strong>
+      <div>
+        <input id="backendUrlInput" placeholder="e.g. http://10.0.0.1/pop/api"/>
+        <button id="saveBackendUrlBtn">Save</button>
+      </div>
+    </div>
+
+     <div id="audioCard">
+      <strong>Show Details</strong>
+        <div id="fetchShowRow">
+          <button id="fetchShowBtn">Get details</button>
+        </div>
+     </div>
+
+    <div id="showContainer"></div>
+
+    <div id="sendShowRow">
+    </div>
+
+    <div id="serviceSelectCard">
+      <strong>Select Streaming Service</strong>
+      <div id="serviceSelectControls" style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+        <select id="serviceSelect">
+          <option value="">-- Select a service --</option>
+          <option value="https://www.netflix.com">Netflix</option>
+          <option value="https://www.primevideo.com">Prime Video</option>
+          <option value="https://www.hotstar.com">JioHotstar</option>
+          <option value="other">Other</option>
+        </select>
+        <input type="text" id="otherUrl" placeholder="Enter URL (example: hotstar.com)" style="display:none; flex:1;">
+        <button id="openServiceBtn" class="text-button">Open</button>
+      </div>
+    </div>
+
+    <div id="audioCard">
+      <strong>Trailers</strong>
+      <div id="fetchShowRow">
+        <button id="fetchTrailersBtn">Get Trailers</button>
+      </div>
+      <div id="trailersContainer" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      <button id="sendSelectedTrailers" class="text-button" disabled>Start show with selected trailers</button>
+    </div>
+    
+  </div>
+
+
+  <script type="module">
+    const audio = new Audio('./smooth-soul-356097.mp3');
+    audio.loop = true;
+
+    async function initAudioDevices() {
+      try {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const speakers = devices.filter(d => d.kind === 'audiooutput');
+        const select = document.getElementById('speakerSelect');
+
+        speakers.forEach(d => {
+          const option = document.createElement('option');
+          option.value = d.deviceId;
+          option.textContent = d.label || `Speaker ${d.deviceId}`;
+          select.appendChild(option);
+        });
+
+        select.addEventListener('change', async (e) => {
+          const deviceId = e.target.value;
+          if (audio.setSinkId) await audio.setSinkId(deviceId);
+        });
+      } catch (err) {
+        console.warn('Cannot access audio devices:', err);
+      }
+    }
+
+    document.getElementById('startAudioBtn').addEventListener('click', () => audio.play().catch(console.warn));
+    document.getElementById('stopAudioBtn').addEventListener('click', () => { audio.pause(); audio.currentTime = 0; });
+    document.getElementById('closeFullscreenBtn').addEventListener('click', () => {
+      window.api.closeFullscreen();
+      window.api.onFullscreenStatus((isOpen) => {
+        const displaysContainer = document.getElementById('displays');
+        displaysContainer.style.display = isOpen ? 'none' : 'flex';
+      });
+
+    });
+
+
+    initAudioDevices();
+
+    const displaysContainer = document.getElementById('displays');
+
+async function init() {
+  const displays = await window.api.getDisplays();
+  displaysContainer.innerHTML = '';
+    let displayNumber = 1;
+  displays.forEach(d => {
+    const div = document.createElement('div');
+    div.className = 'display-card';
+    div.innerHTML = `<strong>Screen ${displayNumber}</strong><br>${d.width}×${d.height}`;
+    div.onclick = () => {
+    if (!div.classList.contains('disabled')) {
+        window.api.openDisplay(d.id);
+
+        div.classList.add('selected');
+
+        const allCards = document.querySelectorAll('.display-card');
+        allCards.forEach(card => {
+            if (card !== div) card.classList.add('disabled');
+        });
+
+        div.style.borderColor = '#0f9d58';
+        div.style.boxShadow = '0 6px 12px rgba(0, 157, 88, 0.5)';
+    }
+};
+displayNumber = displayNumber + 1;
+    displaysContainer.appendChild(div);
+  });
+}
+
+window.api.onFullscreenStatus((isOpen) => {
+    const allCards = document.querySelectorAll('.display-card');
+    if (isOpen) {
+        allCards.forEach(card => {
+            if (!card.classList.contains('selected')) {
+                card.style.opacity = 0.3;
+                card.style.pointerEvents = 'none';
+            }
+        });
+    } else {
+        allCards.forEach(card => {
+            card.classList.remove('disabled', 'selected');
+            card.style.opacity = 1;
+            card.style.pointerEvents = 'auto';
+            card.style.borderColor = '#333';
+            card.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+        });
+    }
+});
+
+
+    init();
+
+    const fetchBtn = document.getElementById('fetchShowBtn');
+const sendBtn = document.getElementById('sendShowBtn');
+const showContainer = document.getElementById('showContainer');
+
+let fetchedData = null;
+
+fetchBtn.addEventListener('click', async () => {
+  const data = await window.api.fetchNextShow(document.getElementById("backendUrlInput").value);
+  showContainer.innerHTML = ''; 
+
+  const oldSendBtn = document.getElementById('sendShowBtn');
+  if (oldSendBtn) oldSendBtn.remove();
+
+  if (!data || (!data.currentShow && !data.nextShow)) {
+    showContainer.innerText = 'No shows available';
+    return;
+  }
+
+  if (data.currentShow) {
+    const currentDiv = document.createElement('div');
+    currentDiv.innerHTML = `
+      <input type="radio" name="showSelect" id="currentShow" value="current">
+      <label for="currentShow">
+        <div style="display: flex; flex-direction: row; gap: 8px; align-items: center; justify-content: center;">
+          <strong>${data.currentShow.title}</strong> on <strong>${data.currentShow.date}</strong> at <strong>${data.currentShow.time}</strong>
+          <img src="https://image.tmdb.org/t/p/w500${data.currentShow.poster_path}" alt="${data.currentShow.title} Poster" style="height:150px; margin-left:10px;">
+        </div>
+      </label>
+    `;
+    currentDiv.dataset.show = JSON.stringify(data.currentShow);
+    showContainer.appendChild(currentDiv);
+  }
+
+  if (data.nextShow) {
+    const nextDiv = document.createElement('div');
+    nextDiv.innerHTML = `
+      <input type="radio" name="showSelect" id="nextShow" value="next">
+      <label for="nextShow">
+        <div style="display: flex; flex-direction: row; gap: 8px; align-items: center; justify-content: center;">
+          <strong>${data.nextShow.title}</strong> on <strong>${data.nextShow.date}</strong> at <strong>${data.nextShow.time}</strong>
+          <img src="https://image.tmdb.org/t/p/w500${data.nextShow.poster_path}" alt="${data.nextShow.title} Poster" style="height:150px; margin-left:10px;">
+        </div>
+      </label>
+    `;
+    nextDiv.dataset.show = JSON.stringify(data.nextShow);
+    showContainer.appendChild(nextDiv);
+  }
+
+  const sendBtn = document.createElement('button');
+  sendBtn.id = 'sendShowBtn';
+  sendBtn.className = 'text-button';
+  sendBtn.disabled = true;
+  sendBtn.textContent = 'Select this show';
+  showContainer.appendChild(sendBtn);
+  const radios = showContainer.querySelectorAll('input[name="showSelect"]');
+
+  radios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      sendBtn.disabled = false;
+    });
+  });
+  sendBtn.addEventListener('click', () => {
+    const selectedRadio = document.querySelector('input[name="showSelect"]:checked');
+    if (!selectedRadio) return alert('Please select a show to send.');
+
+    const selectedDiv = selectedRadio.closest('div');
+    const showData = JSON.parse(selectedDiv.dataset.show);
+
+    window.api.sendShowToFullscreen({ showData });
+  });
+});
+
+    const fetchTrailersBtn = document.getElementById('fetchTrailersBtn');
+
+    const trailersContainer = document.getElementById('trailersContainer');
+const sendSelectedBtn = document.getElementById('sendSelectedTrailers');
+
+fetchTrailersBtn.addEventListener('click', async () => {
+  const trailers = await window.api.fetchTrailers(document.getElementById("backendUrlInput").value);
+  trailersContainer.innerHTML = '';
+  sendSelectedBtn.disabled = true;
+
+  if (!trailers || trailers.length === 0) {
+    trailersContainer.innerHTML = '<p>No trailers available.</p>';
+    return;
+  }
+
+  trailers.forEach(trailer => {
+    const card = document.createElement('div');
+    card.className = 'trailer-card';
+
+    card.innerHTML = `
+      <input type="checkbox" id="${trailer.videoId}">
+      <img src="${trailer.thumbnail}" alt="${trailer.title}">
+      <label for="${trailer.videoId}">${trailer.title}</label>
+    `;
+
+    const checkbox = card.querySelector('input[type="checkbox"]');
+    checkbox.addEventListener('change', () => {
+      sendSelectedBtn.disabled = !trailersContainer.querySelector('input[type="checkbox"]:checked');
+    });
+
+    trailersContainer.appendChild(card);
+  });
+});
+
+sendSelectedBtn.addEventListener('click', () => {
+  const selectedIds = Array.from(trailersContainer.querySelectorAll('input[type="checkbox"]:checked'))
+                           .map(cb => cb.id);
+  if (selectedIds.length > 0) {
+    audio.pause();
+    audio.currentTime = 0;
+    console.log({ showData: { videoIds: selectedIds } })
+    window.api.sendShowToFullscreen({ showData: { videoIds: selectedIds } });
+  }
+});
+
+const serviceSelect = document.getElementById('serviceSelect');
+const openServiceBtn = document.getElementById('openServiceBtn');
+const otherUrl = document.getElementById('otherUrl');
+
+
+openServiceBtn.addEventListener('click', async () => {
+  let url = serviceSelect.value;
+
+  if (!url) {
+    return alert('Please select a service.');
+  }
+
+  if (url === 'other') {
+    url = otherUrl.value.trim();
+    if (!url) return; 
+  }
+
+  window.api.openServiceWindow(url);
+});
+
+otherUrl.addEventListener('focus', () => {
+    if (!otherUrl.value.startsWith('https://www.')) {
+        otherUrl.value = 'https://www.';
+    }
+});
+
+otherUrl.addEventListener('input', () => {
+    if (!otherUrl.value.startsWith('https://www.')) {
+        otherUrl.value = 'https://www.';
+    }
+});
+
+
+serviceSelect.addEventListener('change', () => {
+  if (serviceSelect.value === 'other') {
+    otherUrl.style.display = 'inline-block';
+  } else {
+    otherUrl.style.display = 'none';
+    otherUrl.value = 'https://www.';
+  }
+  updateOpenBtnState();
+});
+
+otherUrl.addEventListener('input', updateOpenBtnState);
+
+function updateOpenBtnState() {
+  if (serviceSelect.value === 'other') {
+    openBtn.disabled = !otherUrl.value.trim();
+  } else {
+    openBtn.disabled = !serviceSelect.value;
+  }
+}
+
+const saved = localStorage.getItem("backendURL");
+  if (saved) document.getElementById("backendUrlInput").value = saved;
+
+  document.getElementById("saveBackendUrlBtn").onclick = () => {
+    const url = document.getElementById("backendUrlInput").value.trim();
+    if (!url) return;
+
+    localStorage.setItem("backendURL", url);
+    console.log("Saved backend URL:", url);
+    document.getElementById("backendUrlInput").value = url;
+    window.electronAPI.setBackendURL(url); 
+  };
+
+  </script>
+</body>
+</html>

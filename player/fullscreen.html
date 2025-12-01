@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Player</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: black;
+  font-family: Arial, sans-serif;
+}
+
+#screen {
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#defaultMessage {
+  color: #ccc;
+  font-size: 2em;
+  text-align: center;
+  z-index: 5;
+}
+
+#showInfo {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  text-align: center;
+  display: none;
+  z-index: 5;
+}
+
+#trailerVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 10;
+}
+</style>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+</head>
+
+<body>
+<div id="screen">
+  <div id="defaultMessage">Configuration in Progress...</div>
+  <div id="showInfo"></div>
+  <div id="trailerVideo"></div>
+  <audio id="audioPlayer" src="./cinematic-music-sketches-11-cinematic-percussion-sketch-116186.mp3"></audio>
+</div>
+
+<script>
+let player = null;
+let trailers = [];
+let currentIndex = 0;
+let apiReady = false;
+
+const audioPlayer = document.getElementById('audioPlayer');
+
+function onYouTubeIframeAPIReady() {
+  apiReady = true;
+}
+
+function ensurePlayerCreated(videoId) {
+  if (!apiReady) {
+    setTimeout(() => ensurePlayerCreated(videoId), 100);
+    return;
+  }
+
+  const el = document.getElementById('trailerVideo');
+
+  if (!player) {
+    el.style.opacity = '1';
+    el.style.visibility = 'visible';
+
+    player = new YT.Player('trailerVideo', {
+      videoId,
+      playerVars: {
+        autoplay: 1,
+        controls: 0,
+        modestbranding: 1,
+        rel: 0,
+        mute: 0,
+        playsinline: 1,
+        fs: 0,
+        iv_load_policy: 3,
+        disablekb: 1
+      },
+      events: {
+        onReady: (e) => e.target.playVideo(),
+        onStateChange: (event) => {
+          if (event.data === YT.PlayerState.ENDED) {
+            currentIndex++;
+            playNextTrailer();
+          }
+        }
+      }
+    });
+
+    return;
+  }
+
+  player.loadVideoById(videoId);
+}
+
+function showBlankScreen() {
+  document.getElementById("screen").style.backgroundImage = '';
+  document.getElementById("trailerVideo").style.opacity = 0;
+  document.getElementById("trailerVideo").style.visibility = "hidden";
+}
+
+function playAudio() {
+  audioPlayer.play();
+  audioPlayer.onended = () => {
+    window.electronAPI.requestMoveStreaming();
+  };
+}
+
+function playNextTrailer() {
+  if (currentIndex >= trailers.length) {
+    showBlankScreen();
+    playAudio();
+    return;
+  }
+  ensurePlayerCreated(trailers[currentIndex]);
+}
+
+// Electron callback
+window.electronAPI.onUpdateData((data) => {
+  if (!data) return;
+
+  const show = data.showData;
+
+  document.getElementById("screen").style.backgroundImage =
+    `url('https://image.tmdb.org/t/p/original${show.backdrop_path}')`;
+
+  document.getElementById("defaultMessage").style.display = "none";
+  document.getElementById("showInfo").style.display = "block";
+
+  if (show.videoIds?.length > 0) {
+    trailers = [...show.videoIds];
+    currentIndex = 0;
+    playNextTrailer();
+  }
+});
+</script>
+</body>
+</html>
