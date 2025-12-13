@@ -54,6 +54,15 @@ The **PoP (potential-octo-potato)** is a home-theater software designed for home
 * Display app showing **Now Showing** and **Next Up** movies.
 * Automatically refreshes based on backend schedule data.
 
+### 5. PoP Player
+
+* An application designed for media automation.
+* Select the screeen you want to watch the media on.
+* Play a background music until you are ready to start the show.
+* Fetch the scheduled show from the backend and display the poster as a placeholder until the show starts.
+* Fetch latest trailers from YouTube to stream before the show starts.
+* Open and configure the media streaming tool of your choice.
+
 ## Features
 
 * Automatic data refresh from TMDB once every 24 hours.
@@ -62,12 +71,12 @@ The **PoP (potential-octo-potato)** is a home-theater software designed for home
 * Server-sided pagination
 * Automatic TMDB data fetching and caching
 * Search for any Movie or TV Show
+* Complete hands free cinema experience with the PoP Player - choose your screen, play trailers before the show and finally stream your show without operating the system.
 
 Optional future extensions:
 
 * Admin Dashboard
 * Notification Service
-* Media Automation Layer
 
 ## Setup Instructions
 
@@ -76,6 +85,7 @@ Optional future extensions:
 * Docker and Docker Compose installed.
 * A valid **TMDB account**, **API key**, and **access token**. Follow this [link](https://developer.themoviedb.org/docs/getting-started) to create an account and generate the tokens as per the instructions given on the page.
 * Know the **ISO-3166-1** code of the country you live in or want to watch media of (Simple google search reveals this, e.g. - ISO-3166-1 country code for India).
+* A valid **YouTube API key**. Follow this [link]([https://developer.themoviedb.org/docs/getting-started](https://developers.google.com/youtube/v3/getting-started)) to generate the token as per the instructions given on the page
 
 ## Deployment Guide
 
@@ -270,7 +280,7 @@ nano docker-compose.yml
     - Replace the placeholders PoP_DB_USER, PoP_DB_USER_PASSWORD with the user credentials created eralier for the db `potential-octo-potato`
       > Note- if the password containes special characters (@,#,$ etc.) then they must be url encoded before pasting in the compose file.
 
-    - Provide your `TMDB_API_KEY` and `REGION` 
+    - Provide your `TMDB_API_KEY`, `REGION` and `YT_API_KEY`
 
 ```yaml
 version: "3.9"
@@ -286,6 +296,7 @@ services:
       - TMDB_API_KEY=<your_TMDB_API_KEY_here>
       - REGION=<ISO-3166-1_country_code>
       - PORT=<desired_PORT>
+      - YT_API_KEY=<your_YT_API_KEY_here>
     networks: 
       - pop-net
 
@@ -359,6 +370,14 @@ To provide a cinema-like experience in your home theater, you can set up PoP ser
 
   * All frontend apps and the backend must be **self-hosted on the home lab server** (see Deployment section) for proper functionality of the ecosystem.
 
+* **PoP Player:**
+
+  * Download the zip file from the releases page.
+  * Extract and install the app using `PoP Player Setup (version_number).exe`.
+  * Follow installation instructions that follow.
+  * Laucnh the app `PoP Player`.
+  * Before being able to fetch the scheduled show information and trailers from YouTube, the app need you to provide the url of your hosted backend which would be `http://10.0.0.1/pop/api` if Deployment Instructions were followed as is otherwise it would be `http://<your_server_ip_here>/pop/api`.
+
 ## Local Development Setup
 
 1. Clone the repository:
@@ -390,13 +409,14 @@ To provide a cinema-like experience in your home theater, you can set up PoP ser
       touch .env
       ```
 
-      In the .env file provide the MONGO_URI_DEV, TMDB_API_KEY, REGION and PORT
+      In the .env file provide the MONGO_URI_DEV, TMDB_API_KEY, YT_API_KEY, REGION and PORT
 
       ```text
       MONGO_URI_DEV=mongodb://localhost:<27018>/potential-octo-potato
       TMDB_API_KEY=<your_TMDB_API_KEY_here>
       REGION=<ISO-3166-1_country_code>
       PORT=<desired_port>
+      YT_API_KEY=<your_YT_API_KEY_here>
       ```
     - In the `frontend/potential-octo-potato` folder -
 
