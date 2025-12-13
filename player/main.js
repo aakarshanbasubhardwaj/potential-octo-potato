@@ -16,6 +16,7 @@ app.whenReady().then(() => {
     width: Math.floor(width * 0.5),  
     height: Math.floor(height * 0.9),
     autoHideMenuBar: true,
+    icon: path.join(__dirname, "assets/icon.ico"),
     webPreferences: {
       preload: path.join(__dirname, 'renderer.js'),
       contextIsolation: true,
@@ -56,6 +57,7 @@ app.whenReady().then(() => {
   height: display.bounds.height,
   fullscreen: true,
   backgroundColor: '#000',
+  icon: path.join(__dirname, "assets/icon.ico"),
   webPreferences: {
     preload: path.join(__dirname, 'fullscreenPreload.js'),
     contextIsolation: true,
@@ -127,6 +129,7 @@ ipcMain.on('open-service-window', (event, url) => {
   streamingWindow = new BrowserWindow({
     width: 1200,
     height: 800,
+    icon: path.join(__dirname, "assets/icon.ico"),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false

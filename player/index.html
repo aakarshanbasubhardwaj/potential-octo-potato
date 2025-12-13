@@ -457,7 +457,7 @@ h1 {
           <option value="https://www.hotstar.com">JioHotstar</option>
           <option value="other">Other</option>
         </select>
-        <input type="text" id="otherUrl" placeholder="Enter URL (example: hotstar.com)" style="display:none; flex:1;">
+        <input type="text" id="otherUrl" placeholder="Enter URL (e.g.- https://www.hotstar.com)" style="display:none; flex:1;">
         <button id="openServiceBtn" class="text-button">Open</button>
       </div>
     </div>
@@ -705,25 +705,11 @@ openServiceBtn.addEventListener('click', async () => {
   window.api.openServiceWindow(url);
 });
 
-otherUrl.addEventListener('focus', () => {
-    if (!otherUrl.value.startsWith('https://www.')) {
-        otherUrl.value = 'https://www.';
-    }
-});
-
-otherUrl.addEventListener('input', () => {
-    if (!otherUrl.value.startsWith('https://www.')) {
-        otherUrl.value = 'https://www.';
-    }
-});
-
-
 serviceSelect.addEventListener('change', () => {
   if (serviceSelect.value === 'other') {
     otherUrl.style.display = 'inline-block';
   } else {
     otherUrl.style.display = 'none';
-    otherUrl.value = 'https://www.';
   }
   updateOpenBtnState();
 });
