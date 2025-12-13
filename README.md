@@ -377,6 +377,8 @@ To provide a cinema-like experience in your home theater, you can set up PoP ser
   * Follow installation instructions that follow.
   * Launch the app `PoP Player`.
   * Before being able to fetch the scheduled show information and trailers from YouTube, the app needs you to provide the url of your hosted backend which would be `http://10.0.0.1/pop/api` if Deployment Instructions were followed as is otherwise it would be `http://<your_server_ip_here>/pop/api`.
+  * Allow the app to access the microphone / speakers when prompted by your windows defender or antivirus program. If denied the app may not be able to play audio properly.
+  * Windows might prompt not to run the app but it is safe to run it anyway.
 
 ## Local Development Setup
 
