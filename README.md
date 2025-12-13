@@ -57,7 +57,7 @@ The **PoP (potential-octo-potato)** is a home-theater software designed for home
 ### 5. PoP Player
 
 * An application designed for media automation.
-* Select the screeen you want to watch the media on.
+* Select the screen you want to watch the media on.
 * Play a background music until you are ready to start the show.
 * Fetch the scheduled show from the backend and display the poster as a placeholder until the show starts.
 * Fetch latest trailers from YouTube to stream before the show starts.
@@ -372,11 +372,11 @@ To provide a cinema-like experience in your home theater, you can set up PoP ser
 
 * **PoP Player:**
 
-  * Download the zip file from the releases page.
-  * Extract and install the app using `PoP Player Setup (version_number).exe`.
+  * Download the zip file `PoP Player Setup 1.0.0.zip` from the [releases page](https://github.com/aakarshanbasubhardwaj/potential-octo-potato/releases/tag/v1.0.0).
+  * Extract and install the app using `PoP Player Setup 1.0.0.exe`.
   * Follow installation instructions that follow.
-  * Laucnh the app `PoP Player`.
-  * Before being able to fetch the scheduled show information and trailers from YouTube, the app need you to provide the url of your hosted backend which would be `http://10.0.0.1/pop/api` if Deployment Instructions were followed as is otherwise it would be `http://<your_server_ip_here>/pop/api`.
+  * Launch the app `PoP Player`.
+  * Before being able to fetch the scheduled show information and trailers from YouTube, the app needs you to provide the url of your hosted backend which would be `http://10.0.0.1/pop/api` if Deployment Instructions were followed as is otherwise it would be `http://<your_server_ip_here>/pop/api`.
 
 ## Local Development Setup
 
