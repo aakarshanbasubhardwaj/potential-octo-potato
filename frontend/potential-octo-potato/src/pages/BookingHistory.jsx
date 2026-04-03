@@ -26,9 +26,12 @@ export default function BookingHistory() {
         if (!res.ok) throw new Error('Failed to fetch tickets');
         const data = await res.json();
 
-        const sortedTickets = data.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
+        const sortedTickets = data.sort((a, b) => {
+          const timeA = new Date(`${a.date} ${a.time}`);
+          const timeB = new Date(`${b.date} ${b.time}`);
+          
+          return timeA - timeB; 
+        });
 
         setTickets(sortedTickets);
       } catch (err) {
